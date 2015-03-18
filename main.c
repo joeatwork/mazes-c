@@ -2,6 +2,7 @@
 #include "mazes.h"
 #include "printer.h"
 #include "binary_tree.h"
+#include "pnger.h"
 
 int main(int argc, char** argv) {
   struct mazes_maze maze;
@@ -21,9 +22,9 @@ int main(int argc, char** argv) {
   mazes_fprint(&maze, stdout);
   mazes_maze_destroy(&maze);
 
-  mazes_maze_init(&maze, 5, 5);
+  mazes_maze_init(&maze, 20, 20);
   mazes_generate_binary_tree(&maze);
   mazes_fprint(&maze, stdout);
+  mazes_png(&maze, "AMAZING.png");
   mazes_maze_destroy(&maze);
-
 }
