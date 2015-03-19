@@ -5,7 +5,7 @@
 
 /* We don't check for overflow in grids,
    so MAX_GRID_DIMENSION must be < sqrt(SIZE_MAX)
-   and (for PNGs) MAX_GRID_DIMENSION < INT_MAX * SOME CONSTANT (see pnger.c) */
+   and (for PNGs) MAX_GRID_DIMENSION < INT_MAX * SOME LOW CONSTANT (see pnger.c) */
 #define MAX_GRID_DIMENSION 128
 #define LINKS_BUFFER_SIZE 4
 #define NEIGHBORS_BUFFER_SIZE 4

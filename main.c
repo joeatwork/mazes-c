@@ -1,30 +1,94 @@
+#include <getopt.h>
 #include <stdio.h>
-#include "mazes.h"
-#include "printer.h"
+#include <stdlib.h>
+#include <string.h>
 #include "binary_tree.h"
+#include "mazes.h"
 #include "pnger.h"
+#include "printer.h"
+#include "utils.h"
+
+enum format_type {
+  FORMAT_TYPE_TEXT,
+  FORMAT_TYPE_PNG,
+};
+
+void usage(char *command_name) {
+  fprintf(stderr, "usage: %s --width=<value> --height=<value> [--format=format]\n", command_name);
+  fprintf(stderr, "          [--format=format] [--algorithm=algorithm]\n");
+  fprintf(stderr, "\n");
+  fprintf(stderr, "available formats are:\n");
+  fprintf(stderr, "    text     print the maze as text\n");
+  fprintf(stderr, "    png      produce the maze as a png file\n");
+  fprintf(stderr, "\n");
+  fprintf(stderr, "available algorithms are:\n");
+  fprintf(stderr, "    binary_tree\n");
+}
 
 int main(int argc, char** argv) {
   struct mazes_maze maze;
-  mazes_maze_init(&maze, 0, 0);
-  mazes_fprint(&maze, stdout);
-  mazes_maze_destroy(&maze);
+  char *command_name = argv[0];
 
-  mazes_maze_init(&maze, 1, 0);
-  mazes_fprint(&maze, stdout);
-  mazes_maze_destroy(&maze);
+  struct option options[] = {
+    {.name = "width", .has_arg = required_argument, .flag = NULL, .val = 'w'},
+    {.name = "height", .has_arg = required_argument, .flag = NULL, .val = 'h'},
+    {.name = "format", .has_arg = required_argument, .flag = NULL, .val = 'f'},
+    {.name = NULL, .has_arg = 0, .flag = NULL, .val = 0}
+  };
 
-  mazes_maze_init(&maze, 0, 1);
-  mazes_fprint(&maze, stdout);
-  mazes_maze_destroy(&maze);
+  long propose_width = 0;
+  long propose_height = 0;
+  enum format_type format = FORMAT_TYPE_TEXT;
 
-  mazes_maze_init(&maze, 5, 5);
-  mazes_fprint(&maze, stdout);
-  mazes_maze_destroy(&maze);
+  int opt;
+  while (-1 != (opt = getopt_long(argc, argv, "w:h:f:", options, NULL))) {
+    switch (opt) {
+    case 'w':
+      propose_width = strtol(optarg, NULL, 10);
+      break;
+    case 'h':
+      propose_height = strtol(optarg, NULL, 10);
+      break;
+    case 'f':
+      if (0 == strcmp("png", optarg)) {
+	format = FORMAT_TYPE_PNG;
+      } else if (0 == strcmp("text", optarg)) {
+	format = FORMAT_TYPE_TEXT;
+      } else {
+	fprintf(stderr, "format must be one of \"png\" or \"text\"\n");
+	usage(command_name);
+	return 1;
+      }
+      break;
+    default:
+      usage(command_name);
+      return 1;
+    }
+  }
 
-  mazes_maze_init(&maze, 20, 20);
+  if (propose_width < 1 ||
+      propose_height < 1 ||
+      propose_width > MAX_GRID_DIMENSION ||
+      propose_height > MAX_GRID_DIMENSION) {
+    fprintf(stderr, "Width and height must be greater than 0 and less than or equal to %d\n", MAX_GRID_DIMENSION);
+    usage(command_name);
+    return 1;
+  }
+
+  mazes_maze_init(&maze, (size_t) propose_width, (size_t) propose_height);
   mazes_generate_binary_tree(&maze);
-  mazes_fprint(&maze, stdout);
-  mazes_png(&maze, "AMAZING.png");
+
+  switch (format) {
+  case FORMAT_TYPE_TEXT:
+    mazes_fprint(&maze, stdout);
+    break;
+  case FORMAT_TYPE_PNG:
+    mazes_png(&maze, "AMAZING.png");
+    break;
+  default:
+    ERROR_EXIT("Unrecognized output format %d", format);
+  }
+
   mazes_maze_destroy(&maze);
+  return 0;
 }
