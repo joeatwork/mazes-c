@@ -21,6 +21,7 @@ struct mazes_cell {
   size_t links_length;
   struct mazes_cell *neighbors[NEIGHBORS_BUFFER_SIZE];
   struct mazes_cell *links[LINKS_BUFFER_SIZE];
+  struct mazes_cell *next;
 };
 
 struct mazes_maze {
@@ -29,6 +30,9 @@ struct mazes_maze {
   struct mazes_cell *grid;
 };
 
+struct mazes_iter;
+
+struct mazes_cell *mazes_first_cell(struct mazes_maze *maze);
 struct mazes_cell *mazes_cell_at(
   struct mazes_maze *const maze,
   const size_t row,

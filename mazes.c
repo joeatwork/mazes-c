@@ -3,7 +3,6 @@
 #include "mazes.h"
 #include "utils.h"
 
-
 static void mazes_cell_init(struct mazes_cell *cell, const size_t row, const size_t column) {
   cell->row = row;
   cell->column = column;
@@ -12,6 +11,7 @@ static void mazes_cell_init(struct mazes_cell *cell, const size_t row, const siz
   for (size_t i = 0; i < NEIGHBORS_BUFFER_SIZE; i++) {
     cell->neighbors[i] = NULL;
   }
+  cell->next = NULL;
 }
 
 void mazes_cells_link(struct mazes_cell *from, struct mazes_cell *to) {
@@ -55,7 +55,15 @@ bool mazes_cells_are_linked(struct mazes_cell *from, struct mazes_cell *to) {
   return 0;
 }
 
-struct mazes_cell *mazes_cell_at(
+struct mazes_cell *mazes_first_cell(struct mazes_maze *maze) {
+  if (0 == maze->row_count || 0 == maze->column_count) {
+    return NULL;
+  } else {
+    return mazes_cell_at(maze, 0, 0);
+  }
+}
+
+struct mazes_cell *mazes_cell_at(/* TODO is this still needed? */
   struct mazes_maze *maze,
   const size_t row,
   const size_t column
@@ -102,6 +110,17 @@ void mazes_maze_init(struct mazes_maze *maze, const size_t row_count, const size
 
       if (col < maze->column_count - 1) {
 	cell->neighbors[EAST_NEIGHBOR] = mazes_cell_at(maze, row, col + 1);
+      }
+
+      size_t next_row = row;
+      size_t next_col = col + 1;
+      if (next_col >= maze->column_count) {
+	next_col = 0;
+	next_row = next_row + 1;
+      }
+
+      if (next_row < maze->row_count) {
+	cell->next = mazes_cell_at(maze, next_row, next_col);
       }
     }
   }  

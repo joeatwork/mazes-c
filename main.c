@@ -74,7 +74,9 @@ int main(int argc, char** argv) {
 	usage(command_name);
 	return 1;
       }
+      break;
     default:
+      fprintf(stderr, "unrecognized option \'%c\'\n", opt);
       usage(command_name);
       return 1;
     }
