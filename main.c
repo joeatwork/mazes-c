@@ -105,7 +105,7 @@ int main(int argc, char** argv) {
     mazes_fprint(&maze, stdout);
     break;
   case FORMAT_TYPE_PNG:
-    mazes_png(&maze, "AMAZING.png");
+    mazes_png(&maze, stdout);
     break;
   default:
     ERROR_EXIT("Unrecognized output format %d", format);

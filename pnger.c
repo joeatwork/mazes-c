@@ -2,11 +2,21 @@
 #include <cairo/cairo.h>
 #include "mazes.h"
 #include "pnger.h"
+#include "utils.h"
 
 #define PATH_WIDTH_PIXELS 10
 
+static cairo_status_t write_to_stream(void *closure, const unsigned char *data, unsigned int length) {
+  FILE *stream = closure;
+  fwrite(data, sizeof(unsigned char), length, stream);
+  if (ferror(stream)) {
+    ERROR_EXIT("Error writing to output file");
+  }
+  return CAIRO_STATUS_SUCCESS;
+}
+
 /* Assumes BIDIRECTIONAL and rectangular Mazes! */
-void mazes_png(struct mazes_maze *maze, const char *filename) {
+void mazes_png(struct mazes_maze *maze, FILE *stream) {
   /* width and height rely on low MAX_GRID_DIMENSION to avoid overflow */
   size_t width = maze->column_count * PATH_WIDTH_PIXELS;
   size_t height = maze->row_count * PATH_WIDTH_PIXELS;
@@ -51,7 +61,7 @@ void mazes_png(struct mazes_maze *maze, const char *filename) {
     }
   }
   
-  cairo_surface_write_to_png(surface, filename);
+  cairo_surface_write_to_png_stream(surface, write_to_stream, stream);
   cairo_destroy(cairo);
   cairo_surface_destroy(surface);
 }
