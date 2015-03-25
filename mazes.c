@@ -63,7 +63,7 @@ struct mazes_cell *mazes_first_cell(struct mazes_maze *maze) {
   }
 }
 
-struct mazes_cell *mazes_cell_at(/* TODO is this still needed? */
+struct mazes_cell *mazes_cell_at(
   struct mazes_maze *maze,
   const size_t row,
   const size_t column
