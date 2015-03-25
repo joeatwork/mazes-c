@@ -13,6 +13,10 @@ enum format_type {
   FORMAT_TYPE_PNG,
 };
 
+enum algorithm_type {
+  ALGORITHM_TYPE_BINARY_TREE,
+};
+
 void usage(char *command_name) {
   fprintf(stderr, "usage: %s --width=<value> --height=<value> [--format=format]\n", command_name);
   fprintf(stderr, "          [--format=format] [--algorithm=algorithm]\n");
@@ -33,15 +37,17 @@ int main(int argc, char** argv) {
     {.name = "width", .has_arg = required_argument, .flag = NULL, .val = 'w'},
     {.name = "height", .has_arg = required_argument, .flag = NULL, .val = 'h'},
     {.name = "format", .has_arg = required_argument, .flag = NULL, .val = 'f'},
+    {.name = "algorithm", .has_arg = required_argument, .flag = NULL, .val = 'a'},
     {.name = NULL, .has_arg = 0, .flag = NULL, .val = 0}
   };
 
   long propose_width = 0;
   long propose_height = 0;
   enum format_type format = FORMAT_TYPE_TEXT;
+  enum algorithm_type algorithm = ALGORITHM_TYPE_BINARY_TREE;
 
   int opt;
-  while (-1 != (opt = getopt_long(argc, argv, "w:h:f:", options, NULL))) {
+  while (-1 != (opt = getopt_long(argc, argv, "w:h:f:a:", options, NULL))) {
     switch (opt) {
     case 'w':
       propose_width = strtol(optarg, NULL, 10);
@@ -60,6 +66,14 @@ int main(int argc, char** argv) {
 	return 1;
       }
       break;
+    case 'a':
+      if (0 == strcmp("binary_tree", optarg)) {
+	algorithm = ALGORITHM_TYPE_BINARY_TREE;
+      } else {
+	fprintf(stderr, "algorithm must be \"binary_tree\"\n");
+	usage(command_name);
+	return 1;
+      }
     default:
       usage(command_name);
       return 1;
@@ -76,7 +90,13 @@ int main(int argc, char** argv) {
   }
 
   mazes_maze_init(&maze, (size_t) propose_width, (size_t) propose_height);
-  mazes_generate_binary_tree(&maze);
+  switch (algorithm) {
+  case ALGORITHM_TYPE_BINARY_TREE:
+    mazes_generate_binary_tree(&maze);
+    break;
+  default:
+    ERROR_EXIT("Unrecognized algorithm %d", algorithm);
+  }
 
   switch (format) {
   case FORMAT_TYPE_TEXT:
