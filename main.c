@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "algorithms.h"
+#include "dotter.h"
 #include "mazes.h"
 #include "pnger.h"
 #include "printer.h"
@@ -11,6 +12,7 @@
 enum format_type {
   FORMAT_TYPE_TEXT,
   FORMAT_TYPE_PNG,
+  FORMAT_TYPE_DOT,
 };
 
 enum algorithm_type {
@@ -23,8 +25,9 @@ void usage(char *command_name) {
   fprintf(stderr, "          [--format=format] [--algorithm=algorithm]\n");
   fprintf(stderr, "\n");
   fprintf(stderr, "available formats are:\n");
-  fprintf(stderr, "    text     print the maze as text\n");
+  fprintf(stderr, "    dot      produce the maze as a dot file\n");
   fprintf(stderr, "    png      produce the maze as a png file\n");
+  fprintf(stderr, "    text     print the maze as text\n");
   fprintf(stderr, "\n");
   fprintf(stderr, "available algorithms are:\n");
   fprintf(stderr, "    binary_tree\n");
@@ -58,7 +61,9 @@ int main(int argc, char** argv) {
       propose_height = strtol(optarg, NULL, 10);
       break;
     case 'f':
-      if (0 == strcmp("png", optarg)) {
+      if (0 == strcmp("dot", optarg)) {
+	format = FORMAT_TYPE_DOT;
+      } else if (0 == strcmp("png", optarg)) {
 	format = FORMAT_TYPE_PNG;
       } else if (0 == strcmp("text", optarg)) {
 	format = FORMAT_TYPE_TEXT;
@@ -108,11 +113,14 @@ int main(int argc, char** argv) {
   }
 
   switch (format) {
-  case FORMAT_TYPE_TEXT:
-    mazes_fprint(&maze, stdout);
+  case FORMAT_TYPE_DOT:
+    mazes_dot(&maze, stdout);
     break;
   case FORMAT_TYPE_PNG:
     mazes_png(&maze, stdout);
+    break;
+  case FORMAT_TYPE_TEXT:
+    mazes_fprint(&maze, stdout);
     break;
   default:
     ERROR_EXIT("Unrecognized output format %d", format);
