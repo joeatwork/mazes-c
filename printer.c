@@ -2,7 +2,7 @@
 #include "printer.h"
 #include "utils.h"
 
-/* RECTANGULAR mazes only. 0 width? 0 height?*/
+/* RECTANGULAR mazes only */
 void mazes_fprint(struct mazes_maze *maze, FILE *stream) {
   fputc('+', stream);
   for (size_t col = 0; col < maze->column_count; col++) {

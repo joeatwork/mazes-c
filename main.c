@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "binary_tree.h"
+#include "algorithms.h"
 #include "mazes.h"
 #include "pnger.h"
 #include "printer.h"
@@ -15,6 +15,7 @@ enum format_type {
 
 enum algorithm_type {
   ALGORITHM_TYPE_BINARY_TREE,
+  ALGORITHM_TYPE_SIDEWINDER,
 };
 
 void usage(char *command_name) {
@@ -27,6 +28,7 @@ void usage(char *command_name) {
   fprintf(stderr, "\n");
   fprintf(stderr, "available algorithms are:\n");
   fprintf(stderr, "    binary_tree\n");
+  fprintf(stderr, "    sidewinder\n");
 }
 
 int main(int argc, char** argv) {
@@ -69,6 +71,8 @@ int main(int argc, char** argv) {
     case 'a':
       if (0 == strcmp("binary_tree", optarg)) {
 	algorithm = ALGORITHM_TYPE_BINARY_TREE;
+      } else if (0 == strcmp("sidewinder", optarg)) {
+	algorithm = ALGORITHM_TYPE_SIDEWINDER;
       } else {
 	fprintf(stderr, "algorithm must be \"binary_tree\"\n");
 	usage(command_name);
@@ -95,6 +99,9 @@ int main(int argc, char** argv) {
   switch (algorithm) {
   case ALGORITHM_TYPE_BINARY_TREE:
     mazes_generate_binary_tree(&maze);
+    break;
+  case ALGORITHM_TYPE_SIDEWINDER:
+    mazes_generate_sidewinder(&maze);
     break;
   default:
     ERROR_EXIT("Unrecognized algorithm %d", algorithm);
