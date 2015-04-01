@@ -16,7 +16,7 @@ static cairo_status_t write_to_stream(void *closure, const unsigned char *data, 
 }
 
 /* Assumes BIDIRECTIONAL and rectangular Mazes! */
-void mazes_png(struct mazes_maze *maze, FILE *stream) {
+void mazes_png(struct mazes_maze *maze, unsigned int *colors, FILE *stream) {
   /* width and height rely on low MAX_GRID_DIMENSION to avoid overflow */
   size_t width = maze->column_count * PATH_WIDTH_PIXELS;
   size_t height = maze->row_count * PATH_WIDTH_PIXELS;

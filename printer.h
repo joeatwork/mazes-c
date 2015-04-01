@@ -5,6 +5,6 @@
 #include "mazes.h"
 
 /* Assumes a rectangular maze*/
-void mazes_fprint(struct mazes_maze *maze, FILE *stream);
+void mazes_fprint(struct mazes_maze *maze, unsigned int *colors, FILE *stream);
 
 #endif

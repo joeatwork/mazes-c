@@ -1,4 +1,4 @@
-OBJECTS=main.o mazes.o utils.o printer.o pnger.o algorithms.o dotter.o
+OBJECTS=algorithms.o distances.o dotter.o main.o mazes.o pnger.o printer.o utils.o
 CFLAGS= -g -Wall -Werror -O3 -std=c11
 LDFLAGS= -lcairo
 CC=gcc-4.7

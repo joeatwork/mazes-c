@@ -20,6 +20,11 @@ struct mazes_cell {
   size_t column;
   size_t neighbors_length;
   size_t links_length;
+  /* cell_number is guaranteed to be compact, unique and start at
+     zero, so always less than MAZE_SIZE. Should be suitable for
+     indexing an array. */
+  size_t cell_number;
+  void *mark;
   struct mazes_cell *neighbors[NEIGHBORS_BUFFER_SIZE];
   struct mazes_cell *links[LINKS_BUFFER_SIZE];
   struct mazes_cell *next;
@@ -31,7 +36,8 @@ struct mazes_maze {
   struct mazes_cell *grid;
 };
 
-struct mazes_iter;
+#define MAZE_SIZE(maze) \
+  ((maze)->row_count * (maze)->column_count)
 
 struct mazes_cell *mazes_first_cell(struct mazes_maze *maze);
 struct mazes_cell *mazes_cell_at(
@@ -39,10 +45,12 @@ struct mazes_cell *mazes_cell_at(
   const size_t row,
   const size_t column
 );
+void mazes_maze_init(struct mazes_maze *maze, size_t row_count, size_t column_count);
+void mazes_maze_destroy(struct mazes_maze *maze);
+
+/* cells must not link to themselves */
 void mazes_cells_link(struct mazes_cell *from, struct mazes_cell *to);
 void mazes_cells_unlink(struct mazes_cell *from, struct mazes_cell *to);
 bool mazes_cells_are_linked(struct mazes_cell *from, struct mazes_cell *to);
-void mazes_maze_init(struct mazes_maze *maze, size_t row_count, size_t column_count);
-void mazes_maze_destroy(struct mazes_maze *maze);
 
 #endif

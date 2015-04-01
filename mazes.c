@@ -1,13 +1,22 @@
+#include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "mazes.h"
 #include "utils.h"
 
-static void mazes_cell_init(struct mazes_cell *cell, const size_t row, const size_t column) {
+static void cell_init(
+  struct mazes_maze *maze,
+  struct mazes_cell *cell,
+  const size_t row,
+  const size_t column
+) {
   cell->row = row;
   cell->column = column;
-  cell->neighbors_length = NEIGHBORS_BUFFER_SIZE;
+  cell->cell_number = (row * maze->column_count) + column;
+  cell->mark = NULL;
   cell->links_length = 0;
+  cell->neighbors_length = NEIGHBORS_BUFFER_SIZE;
   for (size_t i = 0; i < NEIGHBORS_BUFFER_SIZE; i++) {
     cell->neighbors[i] = NULL;
   }
@@ -15,6 +24,7 @@ static void mazes_cell_init(struct mazes_cell *cell, const size_t row, const siz
 }
 
 void mazes_cells_link(struct mazes_cell *from, struct mazes_cell *to) {
+  assert(from != to);
   size_t new_length = from->links_length + 1;
   if (new_length > LINKS_BUFFER_SIZE) {
     ERROR_EXIT("Too many links on a single maze cell");
@@ -88,7 +98,7 @@ void mazes_maze_init(struct mazes_maze *maze, const size_t row_count, const size
   for (size_t row = 0; row < maze->row_count; row++) {
     for (size_t col = 0; col < maze->column_count; col++) {
       struct mazes_cell *cell = mazes_cell_at(maze, row, col);
-      mazes_cell_init(cell, row, col);
+      cell_init(maze, cell, row, col);
     }
   }
 

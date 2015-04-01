@@ -1,6 +1,6 @@
 #include "dotter.h"
 
-void mazes_dot(struct mazes_maze *maze, FILE *stream) {
+void mazes_dot(struct mazes_maze *maze, unsigned int *colors, FILE *stream) {
   fprintf(stream, "/** MAZE: Rectangle %d %d **/\n", maze->column_count, maze->row_count);
   fprintf(stream, "digraph Maze {\n");
   for (struct mazes_cell *cell = mazes_first_cell(maze); NULL != cell; cell = cell->next) {

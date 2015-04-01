@@ -3,7 +3,7 @@
 #include "utils.h"
 
 /* RECTANGULAR mazes only */
-void mazes_fprint(struct mazes_maze *maze, FILE *stream) {
+void mazes_fprint(struct mazes_maze *maze, unsigned int *colors, FILE *stream) {
   fputc('+', stream);
   for (size_t col = 0; col < maze->column_count; col++) {
     fputs("--+", stream);
@@ -15,7 +15,12 @@ void mazes_fprint(struct mazes_maze *maze, FILE *stream) {
     for (size_t col = 0; col < maze->column_count; col++) {
       struct mazes_cell *cell = mazes_cell_at(maze, row, col);
       struct mazes_cell *eastern = cell->neighbors[EAST_NEIGHBOR];
-      fputs("  ", stream);
+      if (NULL == colors) {
+	fputs("  ", stream);
+      } else {
+	fprintf(stream, "%2d", colors[cell->cell_number]);
+      }
+
       if (NULL != eastern) {
 	bool east_link = mazes_cells_are_linked(cell, eastern);
 	bool west_link = mazes_cells_are_linked(eastern, cell);

@@ -4,6 +4,6 @@
 #include <stdio.h>
 #include "mazes.h"
 
-void mazes_dot(struct mazes_maze *maze, FILE *stream);
+void mazes_dot(struct mazes_maze *maze, unsigned int *colors, FILE *stream);
 
 #endif

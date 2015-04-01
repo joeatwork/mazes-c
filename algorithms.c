@@ -42,7 +42,6 @@ void mazes_generate_binary_tree(struct mazes_maze *maze) {
 
 void mazes_generate_sidewinder(struct mazes_maze *maze) {
   static struct mazes_cell *run_buffer[MAX_GRID_DIMENSION];
-
   for (size_t row = 0; row < maze->row_count; row++) {
     size_t run_length = 0;
     for (size_t col = 0; col < maze->column_count; col++) {

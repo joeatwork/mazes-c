@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include "mazes.h"
 
-void mazes_png(struct mazes_maze *maze, FILE *filename);
+void mazes_png(struct mazes_maze *maze, unsigned int *colors, FILE *filename);
 
 #endif
 

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "algorithms.h"
+#include "distances.h"
 #include "dotter.h"
 #include "mazes.h"
 #include "pnger.h"
@@ -20,9 +21,14 @@ enum algorithm_type {
   ALGORITHM_TYPE_SIDEWINDER,
 };
 
+enum coloring_type {
+  COLORING_TYPE_DISTANCE,
+  COLORING_TYPE_NONE,
+};
+
 void usage(char *command_name) {
   fprintf(stderr, "usage: %s --width=<value> --height=<value> [--format=format]\n", command_name);
-  fprintf(stderr, "          [--format=format] [--algorithm=algorithm]\n");
+  fprintf(stderr, "          [--format=format] [--algorithm=algorithm] [--coloring=coloring]\n");
   fprintf(stderr, "\n");
   fprintf(stderr, "available formats are:\n");
   fprintf(stderr, "    dot      produce the maze as a dot file\n");
@@ -32,6 +38,10 @@ void usage(char *command_name) {
   fprintf(stderr, "available algorithms are:\n");
   fprintf(stderr, "    binary_tree\n");
   fprintf(stderr, "    sidewinder\n");
+  fprintf(stderr, "\n");
+  fprintf(stderr, "available colorings are:\n");
+  fprintf(stderr, "    distance\n");
+  fprintf(stderr, "\n");
 }
 
 int main(int argc, char** argv) {
@@ -43,6 +53,7 @@ int main(int argc, char** argv) {
     {.name = "height", .has_arg = required_argument, .flag = NULL, .val = 'h'},
     {.name = "format", .has_arg = required_argument, .flag = NULL, .val = 'f'},
     {.name = "algorithm", .has_arg = required_argument, .flag = NULL, .val = 'a'},
+    {.name = "coloring", .has_arg = required_argument, .flag = NULL, .val = 'c'},
     {.name = NULL, .has_arg = 0, .flag = NULL, .val = 0}
   };
 
@@ -50,6 +61,7 @@ int main(int argc, char** argv) {
   long propose_height = 0;
   enum format_type format = FORMAT_TYPE_TEXT;
   enum algorithm_type algorithm = ALGORITHM_TYPE_BINARY_TREE;
+  enum coloring_type coloring = COLORING_TYPE_NONE;
 
   int opt;
   while (-1 != (opt = getopt_long(argc, argv, "w:h:f:a:", options, NULL))) {
@@ -79,7 +91,18 @@ int main(int argc, char** argv) {
       } else if (0 == strcmp("sidewinder", optarg)) {
 	algorithm = ALGORITHM_TYPE_SIDEWINDER;
       } else {
-	fprintf(stderr, "algorithm must be \"binary_tree\"\n");
+	fprintf(stderr, "algorithm must be \"binary_tree\" or \"sidewinder\"\n");
+	usage(command_name);
+	return 1;
+      }
+      break;
+    case 'c':
+      if (0 == strcmp("distance", optarg)) {
+	coloring = COLORING_TYPE_DISTANCE;
+      } else if (0 == strcmp("none", optarg)) {
+	coloring = COLORING_TYPE_NONE;
+      } else {
+	fprintf(stderr, "coloring must be \"distance\" or \"none\"\n");
 	usage(command_name);
 	return 1;
       }
@@ -112,15 +135,27 @@ int main(int argc, char** argv) {
     ERROR_EXIT("Unrecognized algorithm %d", algorithm);
   }
 
+  unsigned int *colors = NULL;
+  switch (coloring) {
+  case COLORING_TYPE_NONE:
+    break;
+  case COLORING_TYPE_DISTANCE:
+    colors = checked_calloc(MAZE_SIZE(&maze), sizeof(unsigned int));
+    mazes_distances(colors, &maze, mazes_first_cell(&maze));
+    break;
+  default:
+    ERROR_EXIT("Unrecognized coloring %d", coloring);
+  }
+
   switch (format) {
   case FORMAT_TYPE_DOT:
-    mazes_dot(&maze, stdout);
+    mazes_dot(&maze, colors, stdout);
     break;
   case FORMAT_TYPE_PNG:
-    mazes_png(&maze, stdout);
+    mazes_png(&maze, colors, stdout);
     break;
   case FORMAT_TYPE_TEXT:
-    mazes_fprint(&maze, stdout);
+    mazes_fprint(&maze, colors, stdout);
     break;
   default:
     ERROR_EXIT("Unrecognized output format %d", format);
