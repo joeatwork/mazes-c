@@ -18,6 +18,17 @@ static cairo_status_t write_to_stream(void *closure, const unsigned char *data, 
 /* Assumes BIDIRECTIONAL and rectangular Mazes! */
 void mazes_png(struct mazes_maze *maze, unsigned int *colors, FILE *stream) {
   /* width and height rely on low MAX_GRID_DIMENSION to avoid overflow */
+
+  unsigned int max_color = 0;
+  if (NULL != colors) {
+    size_t max_cell_number = maze->row_count * maze->column_count;
+    for (int i = 0; i < max_cell_number; i++) {
+      if (colors[i] > max_color) {
+	max_color = colors[i];
+      }
+    }
+  }
+
   size_t width = maze->column_count * PATH_WIDTH_PIXELS;
   size_t height = maze->row_count * PATH_WIDTH_PIXELS;
   cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_RGB16_565, width + 1, height + 1);
@@ -27,7 +38,6 @@ void mazes_png(struct mazes_maze *maze, unsigned int *colors, FILE *stream) {
   cairo_fill(cairo);
 
   cairo_set_line_width(cairo, 1.0);
-  cairo_set_source_rgb(cairo, 0.0, 0.0, 0.0);
   for (struct mazes_cell *cell = mazes_first_cell(maze); NULL != cell; cell = cell->next) {
     size_t row = cell->row;
     size_t col = cell->column;
@@ -36,6 +46,20 @@ void mazes_png(struct mazes_maze *maze, unsigned int *colors, FILE *stream) {
     struct mazes_cell *eastern = cell->neighbors[EAST_NEIGHBOR];
     struct mazes_cell *western = cell->neighbors[WEST_NEIGHBOR];
 
+    if (max_color > 0) {
+      double intensity = 1.0 - (((double) colors[cell->cell_number]) / max_color);
+      cairo_set_source_rgb(cairo, 0.0, intensity, 0.0);
+      cairo_rectangle(
+          cairo,
+          col * PATH_WIDTH_PIXELS,
+          row * PATH_WIDTH_PIXELS,
+          PATH_WIDTH_PIXELS,
+          PATH_WIDTH_PIXELS
+      );
+      cairo_fill(cairo);
+    }
+
+    cairo_set_source_rgb(cairo, 0.0, 0.0, 0.0);
     if (NULL == northern) {
       cairo_move_to(cairo, col * PATH_WIDTH_PIXELS, row * PATH_WIDTH_PIXELS);
       cairo_line_to(cairo, (col + 1) * PATH_WIDTH_PIXELS, row * PATH_WIDTH_PIXELS);
