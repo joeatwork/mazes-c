@@ -40,6 +40,7 @@ struct mazes_maze {
   ((maze)->row_count * (maze)->column_count)
 
 struct mazes_cell *mazes_first_cell(struct mazes_maze *maze);
+struct mazes_cell *mazes_random_cell(struct mazes_maze *maze);
 struct mazes_cell *mazes_cell_at(
   struct mazes_maze *const maze,
   const size_t row,

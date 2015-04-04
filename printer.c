@@ -3,7 +3,7 @@
 #include "utils.h"
 
 /* RECTANGULAR mazes only */
-void mazes_fprint(struct mazes_maze *maze, unsigned int *colors, FILE *stream) {
+void mazes_print(struct mazes_maze *maze, unsigned int *colors, FILE *stream) {
   fputc('+', stream);
   for (size_t col = 0; col < maze->column_count; col++) {
     fputs("--+", stream);

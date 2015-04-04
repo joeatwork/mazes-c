@@ -5,12 +5,6 @@
 #include "algorithms.h"
 #include "utils.h"
 
-/* THIS IS A TOY. Randomness is a profound topic, but for the
-   application at hand (generating fun Mazes) what follows is
-   random and unbiased enough. */
-#define RANDOM_CHOICE(name, n)\
-  do { name = rand() / (RAND_MAX/n); } while (name == n && n != 0)
-
 void mazes_generate_binary_tree(struct mazes_maze *maze) {
   for (struct mazes_cell *cell = mazes_first_cell(maze); NULL != cell; cell = cell->next) {
     struct mazes_cell *southern = cell->neighbors[SOUTH_NEIGHBOR];
@@ -70,4 +64,23 @@ void mazes_generate_sidewinder(struct mazes_maze *maze) {
       }
     }
   }
+}
+
+void mazes_generate_aldous_broder(struct mazes_maze *maze) {
+  struct mazes_cell *cell = mazes_random_cell(maze);
+  size_t remaining = MAZE_SIZE(maze) - 1;
+  size_t neighbor_choice;
+  while (remaining > 0) {
+    RANDOM_CHOICE(neighbor_choice, cell->neighbors_length);
+    struct mazes_cell *neighbor = cell->neighbors[neighbor_choice];
+    if (NULL != neighbor) {
+      if (0 == neighbor->links_length) {
+	mazes_cells_link(cell, neighbor);
+	mazes_cells_link(neighbor, cell);
+	remaining = remaining - 1;
+      }
+
+      cell = neighbor;
+    }
+  } // while
 }

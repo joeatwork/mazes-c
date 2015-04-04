@@ -73,6 +73,13 @@ struct mazes_cell *mazes_first_cell(struct mazes_maze *maze) {
   }
 }
 
+struct mazes_cell *mazes_random_cell(struct mazes_maze *maze) {
+  size_t size = maze->row_count * maze->column_count;
+  size_t index;
+  RANDOM_CHOICE(index, size);
+  return maze->grid + index;
+}
+
 struct mazes_cell *mazes_cell_at(
   struct mazes_maze *maze,
   const size_t row,
@@ -93,7 +100,7 @@ void mazes_maze_init(struct mazes_maze *maze, const size_t row_count, const size
 
   maze->row_count = row_count;
   maze->column_count = column_count;
-  size_t grid_size = row_count * column_count;
+  size_t grid_size = MAZE_SIZE(maze);
   maze->grid = checked_calloc(grid_size, sizeof(struct mazes_cell));
   for (size_t row = 0; row < maze->row_count; row++) {
     for (size_t col = 0; col < maze->column_count; col++) {

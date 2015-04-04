@@ -5,6 +5,12 @@
 #include <errno.h>
 #include <stdlib.h>
 
+/* RANDOM_CHOICE IS A TOY. Randomness is a profound topic, but for the
+   application at hand (generating fun Mazes) what follows is
+   random and unbiased enough. */
+#define RANDOM_CHOICE(name, n)\
+  do { name = rand() / (RAND_MAX/n); } while (name == n && n != 0)
+
 #define PERROR_EXIT(errnum, format, ...) \
   error_at_line(EXIT_FAILURE, errnum, __FILE__, __LINE__, format, ##__VA_ARGS__)
 
