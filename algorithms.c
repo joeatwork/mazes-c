@@ -84,3 +84,47 @@ void mazes_generate_aldous_broder(struct mazes_maze *maze) {
     }
   } // while
 }
+
+void mazes_generate_backtracker(struct mazes_maze *maze) {
+  size_t stack_max = MAZE_SIZE(maze);
+  struct mazes_cell** stack = checked_calloc(stack_max, sizeof(struct mazes_cell *));
+  size_t stack_depth = 0;
+
+  struct mazes_cell *start = mazes_random_cell(maze);
+  stack[stack_depth] = start;
+  stack_depth = stack_depth + 1;
+
+  while (0 < stack_depth) {
+    struct mazes_cell *stack_top = stack[stack_depth - 1];
+    size_t candidate_count = 0;
+    for (size_t i = 0; i < stack_top->neighbors_length; i++) {
+      if (NULL != stack_top->neighbors[i] && 0 == stack_top->neighbors[i]->links_length) {
+	candidate_count = candidate_count + 1;
+      }
+    }
+
+    if (0 == candidate_count) {
+      stack_depth = stack_depth - 1;
+    } else {
+      size_t next_ix;
+      RANDOM_CHOICE(next_ix, candidate_count);
+      size_t found = 0;
+      struct mazes_cell *next_cell = NULL;
+      for (size_t i = 0; i < stack_top->neighbors_length && NULL == next_cell; i++) {
+	if (NULL != stack_top->neighbors[i] && 0 == stack_top->neighbors[i]->links_length) {
+	  if (found == next_ix) {
+	    next_cell = stack_top->neighbors[i];
+	  }
+
+	  found = found + 1;
+	}
+      }
+
+      assert(NULL != next_cell);
+      mazes_cells_link(stack_top, next_cell);
+      mazes_cells_link(next_cell, stack_top);
+      stack[stack_depth] = next_cell;
+      stack_depth = stack_depth + 1;
+    }
+  }
+}

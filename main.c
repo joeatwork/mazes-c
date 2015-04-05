@@ -24,8 +24,9 @@ void usage(char *command_name) {
   fprintf(stderr, "    text     print the maze as text\n");
   fprintf(stderr, "\n");
   fprintf(stderr, "available algorithms are:\n");
-  fprintf(stderr, "    aldous_broder (takes a long time!)\n");
-  fprintf(stderr, "    binary_tree (the default)\n");
+  fprintf(stderr, "    aldous_broder (could take a long time!)\n");
+  fprintf(stderr, "    backtracker (the default)\n");
+  fprintf(stderr, "    binary_tree\n");
   fprintf(stderr, "    sidewinder\n");
   fprintf(stderr, "\n");
   fprintf(stderr, "available colorings are:\n");
@@ -48,7 +49,7 @@ int main(int argc, char** argv) {
 
   long propose_width = 0;
   long propose_height = 0;
-  algorithm_type algorithm = mazes_generate_binary_tree;
+  algorithm_type algorithm = mazes_generate_backtracker;
   coloring_type coloring = NULL;
   format_type format = mazes_print;
 
@@ -69,7 +70,7 @@ int main(int argc, char** argv) {
       } else if (0 == strcmp("text", optarg)) {
 	format = mazes_print;
       } else {
-	fprintf(stderr, "format must be one of \"png\" or \"text\"\n");
+	fprintf(stderr, "format must be one of \"png\", \"text\", or \"dot\"\n");
 	usage(command_name);
 	return 1;
       }
@@ -77,12 +78,14 @@ int main(int argc, char** argv) {
     case 'a':
       if (0 == strcmp("aldous_broder", optarg)) {
 	algorithm = mazes_generate_aldous_broder;
+      } else if (0 == strcmp("backtracker", optarg)) {
+	algorithm = mazes_generate_backtracker;
       } else if (0 == strcmp("binary_tree", optarg)) {
 	algorithm = mazes_generate_binary_tree;
       } else if (0 == strcmp("sidewinder", optarg)) {
 	algorithm = mazes_generate_sidewinder;
       } else {
-	fprintf(stderr, "algorithm must be \"binary_tree\", \"sidewinder\", or \"aldous_broder\"\n");
+	fprintf(stderr, "algorithm not recognized\n");
 	usage(command_name);
 	return 1;
       }
