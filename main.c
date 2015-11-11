@@ -15,7 +15,7 @@ typedef void (*coloring_type)(unsigned int *distances, struct mazes_maze *maze, 
 typedef void (*format_type)(struct mazes_maze *maze, unsigned int *colors, FILE *stream);
 
 void usage(char *command_name) {
-  fprintf(stderr, "usage: %s --width=<value> --height=<value> [--format=format]\n", command_name);
+  fprintf(stderr, "usage: %s --width=<value> --height=<value> [--seed=n] [--format=format]\n", command_name);
   fprintf(stderr, "          [--format=format] [--algorithm=algorithm] [--coloring=coloring]\n");
   fprintf(stderr, "\n");
   fprintf(stderr, "available formats are:\n");
@@ -41,6 +41,7 @@ int main(int argc, char** argv) {
   struct option options[] = {
     {.name = "width", .has_arg = required_argument, .flag = NULL, .val = 'w'},
     {.name = "height", .has_arg = required_argument, .flag = NULL, .val = 'h'},
+    {.name = "seed", .has_arg = required_argument, .flag = NULL, .val = 's'},
     {.name = "format", .has_arg = required_argument, .flag = NULL, .val = 'f'},
     {.name = "algorithm", .has_arg = required_argument, .flag = NULL, .val = 'a'},
     {.name = "coloring", .has_arg = required_argument, .flag = NULL, .val = 'c'},
@@ -49,6 +50,7 @@ int main(int argc, char** argv) {
 
   long propose_width = 0;
   long propose_height = 0;
+  long propose_seed = 42;
   algorithm_type algorithm = mazes_generate_backtracker;
   coloring_type coloring = NULL;
   format_type format = mazes_print;
@@ -61,6 +63,9 @@ int main(int argc, char** argv) {
       break;
     case 'h':
       propose_height = strtol(optarg, NULL, 10);
+      break;
+    case 's':
+      propose_seed = strtol(optarg, NULL, 10);
       break;
     case 'f':
       if (0 == strcmp("dot", optarg)) {
@@ -117,7 +122,13 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  mazes_maze_init(&maze, (size_t) propose_width, (size_t) propose_height);
+  if (propose_seed == 0) {
+    fprintf(stderr, "Seed must be a nonzero integer\n");
+    usage(command_name);
+    return 1;
+  }
+
+  mazes_maze_init(&maze, (size_t) propose_width, (size_t) propose_height, (unsigned int) propose_seed);
   algorithm(&maze);
 
   unsigned int *colors = NULL;

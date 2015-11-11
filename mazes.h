@@ -46,7 +46,7 @@ struct mazes_cell *mazes_cell_at(
   const size_t row,
   const size_t column
 );
-void mazes_maze_init(struct mazes_maze *maze, size_t row_count, size_t column_count);
+void mazes_maze_init(struct mazes_maze *maze, size_t row_count, size_t column_count, unsigned int rand_seed);
 void mazes_maze_destroy(struct mazes_maze *maze);
 
 /* cells must not link to themselves */

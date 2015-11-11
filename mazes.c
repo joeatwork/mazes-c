@@ -89,7 +89,9 @@ struct mazes_cell *mazes_cell_at(
   return &(maze->grid[grid_index]);
 }
 
-void mazes_maze_init(struct mazes_maze *maze, const size_t row_count, const size_t column_count) {
+void mazes_maze_init(struct mazes_maze *maze, const size_t row_count, const size_t column_count, const unsigned int rand_seed) {
+  srand(rand_seed);
+
   if (row_count > MAX_GRID_DIMENSION) {
     ERROR_EXIT("Mazes must have less than MAX_GRID_DIMENSION rows");
   }
