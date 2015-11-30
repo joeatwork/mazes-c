@@ -69,41 +69,41 @@ int main(int argc, char** argv) {
       break;
     case 'f':
       if (0 == strcmp("dot", optarg)) {
-	format = mazes_dot;
+        format = mazes_dot;
       } else if (0 == strcmp("png", optarg)) {
-	format = mazes_png;
+        format = mazes_png;
       } else if (0 == strcmp("text", optarg)) {
-	format = mazes_print;
+        format = mazes_print;
       } else {
-	fprintf(stderr, "format must be one of \"png\", \"text\", or \"dot\"\n");
-	usage(command_name);
-	return 1;
+        fprintf(stderr, "format must be one of \"png\", \"text\", or \"dot\"\n");
+        usage(command_name);
+        return 1;
       }
       break;
     case 'a':
       if (0 == strcmp("aldous_broder", optarg)) {
-	algorithm = mazes_generate_aldous_broder;
+        algorithm = mazes_generate_aldous_broder;
       } else if (0 == strcmp("backtracker", optarg)) {
-	algorithm = mazes_generate_backtracker;
+        algorithm = mazes_generate_backtracker;
       } else if (0 == strcmp("binary_tree", optarg)) {
-	algorithm = mazes_generate_binary_tree;
+        algorithm = mazes_generate_binary_tree;
       } else if (0 == strcmp("sidewinder", optarg)) {
-	algorithm = mazes_generate_sidewinder;
+        algorithm = mazes_generate_sidewinder;
       } else {
-	fprintf(stderr, "algorithm not recognized\n");
-	usage(command_name);
-	return 1;
+        fprintf(stderr, "algorithm not recognized\n");
+        usage(command_name);
+        return 1;
       }
       break;
     case 'c':
       if (0 == strcmp("distance", optarg)) {
-	coloring = mazes_distances;
+        coloring = mazes_distances;
       } else if (0 == strcmp("none", optarg)) {
-	coloring = NULL;
+        coloring = NULL;
       } else {
-	fprintf(stderr, "coloring must be \"distance\" or \"none\"\n");
-	usage(command_name);
-	return 1;
+        fprintf(stderr, "coloring must be \"distance\" or \"none\"\n");
+        usage(command_name);
+        return 1;
       }
       break;
     default:

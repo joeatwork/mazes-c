@@ -35,9 +35,9 @@ void mazes_distances(
     for (size_t i = 0; i < home->links_length; i++) {
       struct mazes_cell *next = home->links[i];
       if (NULL == next->mark) {
-	distances[next->cell_number] = home_distance + 1;
-	stack[stack_depth] = next;
-	stack_depth++;
+        distances[next->cell_number] = home_distance + 1;
+        stack[stack_depth] = next;
+        stack_depth++;
       }
     }
   }

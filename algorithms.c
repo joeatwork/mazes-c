@@ -21,9 +21,9 @@ void mazes_generate_binary_tree(struct mazes_maze *maze) {
       int coin;
       RANDOM_CHOICE(coin, 2);
       if (coin) {
-	link = southern;
+        link = southern;
       } else {
-	link = eastern;
+        link = eastern;
       }
     }
 
@@ -47,20 +47,20 @@ void mazes_generate_sidewinder(struct mazes_maze *maze) {
       int coin;
       RANDOM_CHOICE(coin, 2);
       if (NULL == eastern || (NULL != cell->neighbors[SOUTH_NEIGHBOR] && coin)) {
-	size_t choice_ix;
-	RANDOM_CHOICE(choice_ix, run_length);
-	struct mazes_cell *choice = run_buffer[choice_ix];
-	struct mazes_cell *choice_southern = choice->neighbors[SOUTH_NEIGHBOR];
+        size_t choice_ix;
+        RANDOM_CHOICE(choice_ix, run_length);
+        struct mazes_cell *choice = run_buffer[choice_ix];
+        struct mazes_cell *choice_southern = choice->neighbors[SOUTH_NEIGHBOR];
 
-	if (NULL != choice_southern) {
-	  mazes_cells_link(choice, choice_southern);
-	  mazes_cells_link(choice_southern, choice);
-	}
+        if (NULL != choice_southern) {
+          mazes_cells_link(choice, choice_southern);
+          mazes_cells_link(choice_southern, choice);
+        }
 
-	run_length = 0;
+        run_length = 0;
       } else {
-	mazes_cells_link(cell, eastern);
-	mazes_cells_link(eastern, cell);
+        mazes_cells_link(cell, eastern);
+        mazes_cells_link(eastern, cell);
       }
     }
   }
@@ -75,9 +75,9 @@ void mazes_generate_aldous_broder(struct mazes_maze *maze) {
     struct mazes_cell *neighbor = cell->neighbors[neighbor_choice];
     if (NULL != neighbor) {
       if (0 == neighbor->links_length) {
-	mazes_cells_link(cell, neighbor);
-	mazes_cells_link(neighbor, cell);
-	remaining = remaining - 1;
+        mazes_cells_link(cell, neighbor);
+        mazes_cells_link(neighbor, cell);
+        remaining = remaining - 1;
       }
 
       cell = neighbor;
@@ -99,7 +99,7 @@ void mazes_generate_backtracker(struct mazes_maze *maze) {
     size_t candidate_count = 0;
     for (size_t i = 0; i < stack_top->neighbors_length; i++) {
       if (NULL != stack_top->neighbors[i] && 0 == stack_top->neighbors[i]->links_length) {
-	candidate_count = candidate_count + 1;
+        candidate_count = candidate_count + 1;
       }
     }
 
@@ -111,13 +111,13 @@ void mazes_generate_backtracker(struct mazes_maze *maze) {
       size_t found = 0;
       struct mazes_cell *next_cell = NULL;
       for (size_t i = 0; i < stack_top->neighbors_length && NULL == next_cell; i++) {
-	if (NULL != stack_top->neighbors[i] && 0 == stack_top->neighbors[i]->links_length) {
-	  if (found == next_ix) {
-	    next_cell = stack_top->neighbors[i];
-	  }
+        if (NULL != stack_top->neighbors[i] && 0 == stack_top->neighbors[i]->links_length) {
+          if (found == next_ix) {
+            next_cell = stack_top->neighbors[i];
+          }
 
-	  found = found + 1;
-	}
+          found = found + 1;
+        }
       }
 
       assert(NULL != next_cell);

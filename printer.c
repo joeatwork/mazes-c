@@ -16,25 +16,25 @@ void mazes_print(struct mazes_maze *maze, unsigned int *colors, FILE *stream) {
       struct mazes_cell *cell = mazes_cell_at(maze, row, col);
       struct mazes_cell *eastern = cell->neighbors[EAST_NEIGHBOR];
       if (NULL == colors) {
-	fputs("  ", stream);
+        fputs("  ", stream);
       } else {
-	fprintf(stream, "%2d", colors[cell->cell_number]);
+        fprintf(stream, "%2d", colors[cell->cell_number]);
       }
 
       if (NULL != eastern) {
-	bool east_link = mazes_cells_are_linked(cell, eastern);
-	bool west_link = mazes_cells_are_linked(eastern, cell);
-	if (east_link && west_link) {
-	  fputc(' ', stream);
-	} else if (east_link) {
-	  fputc('>', stream);
-	} else if (west_link) {
-	  fputc('<', stream);
-	} else {
-	  fputc('|', stream);
-	}
+        bool east_link = mazes_cells_are_linked(cell, eastern);
+        bool west_link = mazes_cells_are_linked(eastern, cell);
+        if (east_link && west_link) {
+          fputc(' ', stream);
+        } else if (east_link) {
+          fputc('>', stream);
+        } else if (west_link) {
+          fputc('<', stream);
+        } else {
+          fputc('|', stream);
+        }
       } else {
-	fputc('|', stream);
+        fputc('|', stream);
       }
     }
     fputc('\n', stream);
@@ -44,19 +44,19 @@ void mazes_print(struct mazes_maze *maze, unsigned int *colors, FILE *stream) {
       struct mazes_cell *cell = mazes_cell_at(maze, row, col);
       struct mazes_cell *southern = cell->neighbors[SOUTH_NEIGHBOR];
       if (NULL != southern) {
-	bool south_link = mazes_cells_are_linked(cell, southern);
-	bool north_link = mazes_cells_are_linked(southern, cell);
-	if (south_link && north_link) {
-	  fputs("  ", stream);
-	} else if (south_link) {
-	  fputs("!!", stream); /* "!" is the best character I could come up with? */
-	} else if (north_link) {
-	  fputs("^^", stream);
-	} else {
-	  fputs("--", stream);
-	}
+        bool south_link = mazes_cells_are_linked(cell, southern);
+        bool north_link = mazes_cells_are_linked(southern, cell);
+        if (south_link && north_link) {
+          fputs("  ", stream);
+        } else if (south_link) {
+          fputs("!!", stream); /* "!" is the best character I could come up with? */
+        } else if (north_link) {
+          fputs("^^", stream);
+        } else {
+          fputs("--", stream);
+        }
       } else {
-	fputs("--", stream);
+        fputs("--", stream);
       }
       fputc('+', stream);
     }

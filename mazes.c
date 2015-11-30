@@ -116,30 +116,30 @@ void mazes_maze_init(struct mazes_maze *maze, const size_t row_count, const size
     for (size_t col = 0; col < maze->column_count; col++) {
       struct mazes_cell *const cell = mazes_cell_at(maze, row, col);
       if (row > 0) {
-	cell->neighbors[NORTH_NEIGHBOR] = mazes_cell_at(maze, row - 1, col);
+        cell->neighbors[NORTH_NEIGHBOR] = mazes_cell_at(maze, row - 1, col);
       }
 
       if (row < maze->row_count - 1) {
-	cell->neighbors[SOUTH_NEIGHBOR] = mazes_cell_at(maze, row + 1, col);
+        cell->neighbors[SOUTH_NEIGHBOR] = mazes_cell_at(maze, row + 1, col);
       }
 
       if (col > 0) {
-	cell->neighbors[WEST_NEIGHBOR] = mazes_cell_at(maze, row, col - 1);
+        cell->neighbors[WEST_NEIGHBOR] = mazes_cell_at(maze, row, col - 1);
       }
 
       if (col < maze->column_count - 1) {
-	cell->neighbors[EAST_NEIGHBOR] = mazes_cell_at(maze, row, col + 1);
+        cell->neighbors[EAST_NEIGHBOR] = mazes_cell_at(maze, row, col + 1);
       }
 
       size_t next_row = row;
       size_t next_col = col + 1;
       if (next_col >= maze->column_count) {
-	next_col = 0;
-	next_row = next_row + 1;
+        next_col = 0;
+        next_row = next_row + 1;
       }
 
       if (next_row < maze->row_count) {
-	cell->next = mazes_cell_at(maze, next_row, next_col);
+        cell->next = mazes_cell_at(maze, next_row, next_col);
       }
     }
   }  

@@ -24,7 +24,7 @@ void mazes_png(struct mazes_maze *maze, unsigned int *colors, FILE *stream) {
     size_t max_cell_number = MAZE_SIZE(maze);
     for (int i = 0; i < max_cell_number; i++) {
       if (colors[i] > max_color) {
-	max_color = colors[i];
+        max_color = colors[i];
       }
     }
   }
