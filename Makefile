@@ -24,4 +24,4 @@ endif
 clean:
 	rm $(OBJECTS)
 
-.PHONY: clean all
+.PHONY: clean all container push-container
