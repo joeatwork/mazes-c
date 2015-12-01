@@ -5,7 +5,7 @@ SIZE=${SIZE:-32}
 
 while true
 do
-    (cat <<EOF && $DIR/mazes --width=$SIZE --height=$SIZE --format=png --seed=$RANDOM) | nc -l 20202 > /dev/null
+    (cat <<EOF && $DIR/mazes --width=$SIZE --height=$SIZE --format=png --coloring=distance --seed=$RANDOM) | nc -l 20202 > /dev/null
 HTTP/1.1 200 OK
 Content-Type: image/png
 Connection: close
