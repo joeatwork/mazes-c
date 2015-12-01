@@ -2,12 +2,23 @@
 #define __MAZES_H__
 
 #include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
 
 /* We don't check for overflow in grids,
    so MAX_GRID_DIMENSION must be < sqrt(SIZE_MAX)
    and MAX_GRID_DIMENSION must be < RAND_MAX
-   and (for PNGs) MAX_GRID_DIMENSION < INT_MAX * SOME LOW CONSTANT (see pnger.c) */
-#define MAX_GRID_DIMENSION 128
+   and (for PNGs) MAX_GRID_DIMENSION < (INT_MAX / SOME LOW CONSTANT) (see pnger.c) */
+#define MAX_GRID_DIMENSION 2048
+
+#if MAX_GRID_DIMENSION >= SIZE_MAX / MAX_GRID_DIMENSION
+#error MAX_GRID_DIMENSION is too large, and will overflow size_t
+#endif
+
+#if MAX_GRID_DIMENSION >= RAND_MAX
+#error MAX_GRID_DIMENSION is too large, and will overflow rand()
+#endif
+
 #define LINKS_BUFFER_SIZE 4
 #define NEIGHBORS_BUFFER_SIZE 4
 #define NORTH_NEIGHBOR 0
