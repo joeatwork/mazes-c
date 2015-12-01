@@ -1,10 +1,72 @@
+#include <limits.h>
+#include <math.h>
 #include <stdlib.h>
 #include <cairo/cairo.h>
 #include "mazes.h"
 #include "pnger.h"
 #include "utils.h"
 
+// Possible overflow if
+// MAX_GRID_DIMENSION * (PATH_WIDTH_PIXELS + 2ish) > INT_MAX
 #define PATH_WIDTH_PIXELS 10
+
+#if MAX_GRID_DIMENSION >= (INT_MAX / (PATH_WIDTH_PIXELS + 1)) - 1
+#error MAX_GRID_DIMENSION is too large, and will overflow in png generation
+#endif
+
+// Cargo-culted from a stack-overflow answer
+// (in particular, http://stackoverflow.com/questions/3018313/algorithm-to-convert-rgb-to-hsv-and-hsv-to-rgb-in-range-0-255-for-both)
+struct rgb {
+  double r;
+  double g;
+  double b;
+};
+
+static struct rgb hsv2rgb(double hh) {
+    if(hh >= 360.0) hh = 0.0;
+    hh /= 60.0;
+    int i = (long)hh;
+    double ff = hh - i;
+    double p = 0;
+    double q = 1.0 - ff;
+
+    struct rgb out;
+    switch(i) {
+    case 0:
+        out.r = 1.0;
+        out.g = ff;
+        out.b = p;
+        break;
+    case 1:
+        out.r = q;
+        out.g = 1.0;
+        out.b = p;
+        break;
+    case 2:
+        out.r = p;
+        out.g = 1.0;
+        out.b = ff;
+        break;
+
+    case 3:
+        out.r = p;
+        out.g = q;
+        out.b = 1.0;
+        break;
+    case 4:
+        out.r = ff;
+        out.g = p;
+        out.b = 1.0;
+        break;
+    case 5:
+    default:
+        out.r = 1.0;
+        out.g = p;
+        out.b = q;
+        break;
+    }
+    return out;
+}
 
 static cairo_status_t write_to_stream(void *closure, const unsigned char *data, unsigned int length) {
   FILE *stream = closure;
@@ -38,6 +100,19 @@ void mazes_png(struct mazes_maze *maze, unsigned int *colors, FILE *stream) {
   cairo_fill(cairo);
 
   cairo_set_line_width(cairo, 1.0);
+
+  struct rgb increments = {0,0,0};
+  double start_hue = 360.0 * ((double) rand()/RAND_MAX);
+  double end_hue = fmod(start_hue + 180.0, 360.0);
+  struct rgb start_color = hsv2rgb(start_hue);
+  struct rgb end_color = hsv2rgb(end_hue);
+
+  if (max_color > 0) {
+    increments.r = (end_color.r - start_color.r) / max_color;
+    increments.g = (end_color.g - start_color.g) / max_color;
+    increments.b = (end_color.b - start_color.b) / max_color;
+  }
+
   for (struct mazes_cell *cell = mazes_first_cell(maze); NULL != cell; cell = cell->next) {
     size_t row = cell->row;
     size_t col = cell->column;
@@ -47,8 +122,11 @@ void mazes_png(struct mazes_maze *maze, unsigned int *colors, FILE *stream) {
     struct mazes_cell *western = cell->neighbors[WEST_NEIGHBOR];
 
     if (max_color > 0) {
-      double intensity = 1.0 - (((double) colors[cell->cell_number]) / max_color);
-      cairo_set_source_rgb(cairo, 0.0, intensity, 0.0);
+      double r = start_color.r + increments.r * colors[cell->cell_number];
+      double g = start_color.g + increments.g * colors[cell->cell_number];
+      double b = start_color.b + increments.b * colors[cell->cell_number];
+
+      cairo_set_source_rgb(cairo, r, g, b);
       cairo_rectangle(
           cairo,
           col * PATH_WIDTH_PIXELS,
@@ -84,7 +162,7 @@ void mazes_png(struct mazes_maze *maze, unsigned int *colors, FILE *stream) {
       cairo_stroke(cairo);
     }
   }
-  
+
   cairo_surface_write_to_png_stream(surface, write_to_stream, stream);
   cairo_destroy(cairo);
   cairo_surface_destroy(surface);

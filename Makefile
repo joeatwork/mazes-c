@@ -1,6 +1,6 @@
 OBJECTS=algorithms.o distances.o dotter.o main.o mazes.o pnger.o printer.o utils.o
 CFLAGS= -g -Wall -Werror -O3 -std=c11
-LDFLAGS= -lcairo
+LDFLAGS= -lcairo -lm
 GITSHA=$(shell git rev-parse HEAD)
 GITDIRTY=$(shell git status --porcelain 2> /dev/null)
 CC=gcc
