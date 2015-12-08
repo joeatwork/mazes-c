@@ -16,6 +16,10 @@ typedef void (*algorithm_type)(struct mazes_maze *maze);
 typedef void (*coloring_type)(unsigned int *distances, struct mazes_maze *maze, struct mazes_cell *start);
 typedef void (*format_type)(struct mazes_maze *maze, unsigned int *colors, FILE *stream);
 
+void no_algorithm(struct mazes_maze *maze) {
+  ; // Do nothing
+}
+
 void usage(char *command_name) {
   fprintf(stderr, "usage: %s --width=<value> --height=<value> [--seed=n] [--format=format]\n", command_name);
   fprintf(stderr, "          [--format=format] [--algorithm=algorithm] [--coloring=coloring]\n");
@@ -28,8 +32,8 @@ void usage(char *command_name) {
   fprintf(stderr, "available algorithms are:\n");
   fprintf(stderr, "    aldous_broder (could take a long time!)\n");
   fprintf(stderr, "    backtracker (the default)\n");
-  fprintf(stderr, "    binary_tree\n");
-  fprintf(stderr, "    sidewinder\n");
+  fprintf(stderr, "    tree\n");
+  fprintf(stderr, "    none (not a maze, just a grid!)\n");
   fprintf(stderr, "\n");
   fprintf(stderr, "available colorings are:\n");
   fprintf(stderr, "    distance\n");
@@ -87,10 +91,10 @@ int main(int argc, char** argv) {
         algorithm = mazes_generate_aldous_broder;
       } else if (0 == strcmp("backtracker", optarg)) {
         algorithm = mazes_generate_backtracker;
-      } else if (0 == strcmp("binary_tree", optarg)) {
-        algorithm = mazes_generate_binary_tree;
-      } else if (0 == strcmp("sidewinder", optarg)) {
-        algorithm = mazes_generate_sidewinder;
+      } else if (0 == strcmp("tree", optarg)) {
+        algorithm = mazes_generate_tree;
+	  } else if (0 == strcmp("none", optarg)) {
+        algorithm = no_algorithm;
       } else {
         fprintf(stderr, "algorithm not recognized\n");
         usage(command_name);
@@ -116,10 +120,17 @@ int main(int argc, char** argv) {
   }
 
   if (propose_width < 1 ||
-      propose_height < 1 ||
-      propose_width > MAX_GRID_DIMENSION ||
-      propose_height > MAX_GRID_DIMENSION) {
-    fprintf(stderr, "Width and height must be greater than 0 and less than or equal to %d\n", MAX_GRID_DIMENSION);
+      propose_height < 1) {
+    fprintf(stderr, "Width and height must be greater than 0\n");
+    usage(command_name);
+    return 1;
+  }
+
+  if (propose_width >= SIZE_MAX / propose_height ||
+      propose_height >= SIZE_MAX / propose_width ||
+      propose_width >= RAND_MAX ||
+      propose_height >= RAND_MAX) {
+    fprintf(stderr, "Width and height are too large\n");
     usage(command_name);
     return 1;
   }
@@ -130,12 +141,24 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  mazes_maze_init(&maze, (size_t) propose_width, (size_t) propose_height, (unsigned int) propose_seed);
+  size_t propose_size[2] = {
+	propose_width,
+	propose_height
+  };
+
+  srand(propose_seed);
+  mazes_maze_init(
+    &maze,
+	propose_size,
+	2
+  );
+  mazes_maze_arrange_as_rectangle(&maze);
   algorithm(&maze);
 
   unsigned int *colors = NULL;
   if (NULL != coloring) {
-    colors = checked_calloc(MAZE_SIZE(&maze), sizeof(unsigned int));
+    // TODO - using uint for colors means we'll wrap if distances exceed MAX_UINT
+    colors = checked_calloc(mazes_maze_size(&maze), sizeof(unsigned int));
     coloring(colors, &maze, mazes_first_cell(&maze));
   }
 

@@ -21,7 +21,7 @@
 inline void *checked_calloc(size_t nmemb, size_t size) {
   void *mem = calloc(nmemb, size);
   if (NULL == mem) {
-    PERROR_EXIT(errno, "malloc failed");
+    PERROR_EXIT(errno, "calloc failed");
   }
   return mem;
 }

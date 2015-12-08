@@ -3,8 +3,7 @@
 
 #include "mazes.h"
 
-void mazes_generate_binary_tree(struct mazes_maze *maze);
-void mazes_generate_sidewinder(struct mazes_maze *maze);
+void mazes_generate_tree(struct mazes_maze *maze);
 void mazes_generate_aldous_broder(struct mazes_maze *maze);
 void mazes_generate_backtracker(struct mazes_maze *maze);
 

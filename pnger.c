@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <limits.h>
 #include <math.h>
 #include <stdlib.h>
@@ -6,13 +7,7 @@
 #include "pnger.h"
 #include "utils.h"
 
-// Possible overflow if
-// MAX_GRID_DIMENSION * (PATH_WIDTH_PIXELS + 2ish) > INT_MAX
 #define PATH_WIDTH_PIXELS 10
-
-#if MAX_GRID_DIMENSION >= (INT_MAX / (PATH_WIDTH_PIXELS + 1)) - 1
-#error MAX_GRID_DIMENSION is too large, and will overflow in png generation
-#endif
 
 // Cargo-culted from a stack-overflow answer
 // (in particular, http://stackoverflow.com/questions/3018313/algorithm-to-convert-rgb-to-hsv-and-hsv-to-rgb-in-range-0-255-for-both)
@@ -79,11 +74,17 @@ static cairo_status_t write_to_stream(void *closure, const unsigned char *data, 
 
 /* Assumes BIDIRECTIONAL and rectangular Mazes! */
 void mazes_png(struct mazes_maze *maze, unsigned int *colors, FILE *stream) {
-  /* width and height rely on low MAX_GRID_DIMENSION to avoid overflow */
+  assert(2 == maze->dimensions);
+
+  for (size_t i = 0; i < maze->dimensions; i++) {
+    if (maze->size[i] > (INT_MAX / (PATH_WIDTH_PIXELS + 1)) - 1) {
+      ERROR_EXIT("maze is too large to render into a png\n");
+    }
+  }
 
   unsigned int max_color = 0;
   if (NULL != colors) {
-    size_t max_cell_number = MAZE_SIZE(maze);
+    size_t max_cell_number = mazes_maze_size(maze);
     for (int i = 0; i < max_cell_number; i++) {
       if (colors[i] > max_color) {
         max_color = colors[i];
@@ -91,8 +92,8 @@ void mazes_png(struct mazes_maze *maze, unsigned int *colors, FILE *stream) {
     }
   }
 
-  size_t width = maze->column_count * PATH_WIDTH_PIXELS;
-  size_t height = maze->row_count * PATH_WIDTH_PIXELS;
+  size_t width = maze->size[0] * PATH_WIDTH_PIXELS;
+  size_t height = maze->size[1] * PATH_WIDTH_PIXELS;
   cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_RGB16_565, width + 1, height + 1);
   cairo_t *cairo = cairo_create(surface);
   cairo_rectangle(cairo, 0.0, 0.0, width + 1, height + 1);
@@ -107,6 +108,11 @@ void mazes_png(struct mazes_maze *maze, unsigned int *colors, FILE *stream) {
   struct rgb start_color = hsv2rgb(start_hue);
   struct rgb end_color = hsv2rgb(end_hue);
 
+  const size_t NORTH_NEIGHBOR = 0;
+  const size_t SOUTH_NEIGHBOR = 1;
+  const size_t WEST_NEIGHBOR = 2;
+  const size_t EAST_NEIGHBOR = 3;
+  
   if (max_color > 0) {
     increments.r = (end_color.r - start_color.r) / max_color;
     increments.g = (end_color.g - start_color.g) / max_color;
@@ -114,8 +120,8 @@ void mazes_png(struct mazes_maze *maze, unsigned int *colors, FILE *stream) {
   }
 
   for (struct mazes_cell *cell = mazes_first_cell(maze); NULL != cell; cell = cell->next) {
-    size_t row = cell->row;
-    size_t col = cell->column;
+    size_t row = cell->location[1];
+    size_t col = cell->location[0];	
     struct mazes_cell *northern = cell->neighbors[NORTH_NEIGHBOR];
     struct mazes_cell *southern = cell->neighbors[SOUTH_NEIGHBOR];
     struct mazes_cell *eastern = cell->neighbors[EAST_NEIGHBOR];

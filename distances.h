@@ -3,7 +3,8 @@
 
 #include "mazes.h"
 
-/* distances must be at least MAZE_SIZE, and will be indexed by cell->cell_number */
+/* distances must be at least mazes_maze_size(maze) long, and will be
+   indexed by cell->cell_number */
 void mazes_distances(
   unsigned int *distances,
   struct mazes_maze *maze,

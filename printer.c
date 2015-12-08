@@ -1,19 +1,31 @@
+#include <assert.h>
 #include <string.h>
 #include "printer.h"
 #include "utils.h"
 
 /* RECTANGULAR mazes only */
 void mazes_print(struct mazes_maze *maze, unsigned int *colors, FILE *stream) {
+  /* For now, only renders the bottom floor of a maze */
+
+  const size_t SOUTH_NEIGHBOR = 1;
+  const size_t EAST_NEIGHBOR = 3;
+  
   fputc('+', stream);
-  for (size_t col = 0; col < maze->column_count; col++) {
+  for (size_t col = 0; col < maze->size[0]; col++) {
     fputs("--+", stream);
   }
   fputc('\n', stream);
 
-  for (size_t row = 0; row < maze->row_count; row++) {
+  size_t *location = checked_calloc(maze->dimensions, sizeof(size_t));
+  memset(location, 0, sizeof(size_t) * maze->dimensions);
+  
+  for (size_t row = 0; row < maze->size[1]; row++) {
     fputc('|', stream);
-    for (size_t col = 0; col < maze->column_count; col++) {
-      struct mazes_cell *cell = mazes_cell_at(maze, row, col);
+    for (size_t col = 0; col < maze->size[0]; col++) {
+	  location[1] = row;
+	  location[0] = col;
+	  
+      struct mazes_cell *cell = mazes_cell_at(maze, location);
       struct mazes_cell *eastern = cell->neighbors[EAST_NEIGHBOR];
       if (NULL == colors) {
         fputs("  ", stream);
@@ -40,8 +52,9 @@ void mazes_print(struct mazes_maze *maze, unsigned int *colors, FILE *stream) {
     fputc('\n', stream);
 
     fputc('+', stream);
-    for (size_t col = 0; col < maze->column_count; col++) {
-      struct mazes_cell *cell = mazes_cell_at(maze, row, col);
+    for (size_t col = 0; col < maze->size[0]; col++) {
+	  location[0] = col;
+      struct mazes_cell *cell = mazes_cell_at(maze, location);
       struct mazes_cell *southern = cell->neighbors[SOUTH_NEIGHBOR];
       if (NULL != southern) {
         bool south_link = mazes_cells_are_linked(cell, southern);
@@ -62,4 +75,6 @@ void mazes_print(struct mazes_maze *maze, unsigned int *colors, FILE *stream) {
     }
     fputc('\n', stream);
   }
+
+  free(location);
 }

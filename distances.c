@@ -9,7 +9,7 @@ void mazes_distances(
   struct mazes_maze *maze,
   struct mazes_cell *start
 ) {
-  size_t maze_size = MAZE_SIZE(maze);
+  size_t maze_size = mazes_maze_size(maze);
   for (size_t i = 0; i < maze_size; i++) {
     distances[i] = 0;
   }
