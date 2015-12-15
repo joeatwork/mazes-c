@@ -164,5 +164,6 @@ int main(int argc, char** argv) {
 
   format(&maze, colors, stdout);
   mazes_maze_destroy(&maze);
+  free(colors);
   return 0;
 }

@@ -99,4 +99,6 @@ void mazes_generate_backtracker(struct mazes_maze *maze) {
       stack_depth = stack_depth + 1;
     }
   }
+
+  free(stack);
 }

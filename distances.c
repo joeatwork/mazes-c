@@ -41,4 +41,6 @@ void mazes_distances(
       }
     }
   }
+
+  free(stack);
 }
