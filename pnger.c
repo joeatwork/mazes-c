@@ -108,10 +108,10 @@ void mazes_png(struct mazes_maze *maze, unsigned int *colors, FILE *stream) {
   struct rgb start_color = hsv2rgb(start_hue);
   struct rgb end_color = hsv2rgb(end_hue);
 
-  const size_t NORTH_NEIGHBOR = 0;
-  const size_t SOUTH_NEIGHBOR = 1;
-  const size_t WEST_NEIGHBOR = 2;
-  const size_t EAST_NEIGHBOR = 3;
+  const size_t WEST_NEIGHBOR = 0;
+  const size_t EAST_NEIGHBOR = 1;
+  const size_t NORTH_NEIGHBOR = 2;
+  const size_t SOUTH_NEIGHBOR = 3;
   
   if (max_color > 0) {
     increments.r = (end_color.r - start_color.r) / max_color;

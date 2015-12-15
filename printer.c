@@ -7,8 +7,8 @@
 void mazes_print(struct mazes_maze *maze, unsigned int *colors, FILE *stream) {
   /* For now, only renders the bottom floor of a maze */
 
-  const size_t SOUTH_NEIGHBOR = 1;
-  const size_t EAST_NEIGHBOR = 3;
+  const size_t EAST_NEIGHBOR = 1;
+  const size_t SOUTH_NEIGHBOR = 3;
   
   fputc('+', stream);
   for (size_t col = 0; col < maze->size[0]; col++) {
