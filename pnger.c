@@ -2,6 +2,7 @@
 #include <limits.h>
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 #include <cairo/cairo.h>
 #include "mazes.h"
 #include "pnger.h"
@@ -72,10 +73,8 @@ static cairo_status_t write_to_stream(void *closure, const unsigned char *data, 
   return CAIRO_STATUS_SUCCESS;
 }
 
-/* Assumes BIDIRECTIONAL and rectangular Mazes! */
+/* Assumes BIDIRECTIONAL and rectangular Mazes! Only draws ground floor */
 void mazes_png(struct mazes_maze *maze, unsigned int *colors, FILE *stream) {
-  assert(2 == maze->dimensions);
-
   for (size_t i = 0; i < maze->dimensions; i++) {
     if (maze->size[i] > (INT_MAX / (PATH_WIDTH_PIXELS + 1)) - 1) {
       ERROR_EXIT("maze is too large to render into a png\n");
@@ -119,55 +118,63 @@ void mazes_png(struct mazes_maze *maze, unsigned int *colors, FILE *stream) {
     increments.b = (end_color.b - start_color.b) / max_color;
   }
 
-  for (struct mazes_cell *cell = mazes_first_cell(maze); NULL != cell; cell = cell->next) {
-    size_t row = cell->location[1];
-    size_t col = cell->location[0];	
-    struct mazes_cell *northern = cell->neighbors[NORTH_NEIGHBOR];
-    struct mazes_cell *southern = cell->neighbors[SOUTH_NEIGHBOR];
-    struct mazes_cell *eastern = cell->neighbors[EAST_NEIGHBOR];
-    struct mazes_cell *western = cell->neighbors[WEST_NEIGHBOR];
+  size_t *location = checked_calloc(maze->dimensions, sizeof(size_t));
+  memset(location, 0, sizeof(size_t) * maze->dimensions);
+  
+  for (size_t row = 0; row < maze->size[1]; row++) {
+	for (size_t col = 0; col < maze->size[0]; col++) {
+	  location[0] = col;
+	  location[1] = row;
+	  struct mazes_cell *cell = mazes_cell_at(maze, location);
 
-    if (max_color > 0) {
-      double r = start_color.r + increments.r * colors[cell->cell_number];
-      double g = start_color.g + increments.g * colors[cell->cell_number];
-      double b = start_color.b + increments.b * colors[cell->cell_number];
+	  struct mazes_cell *northern = cell->neighbors[NORTH_NEIGHBOR];
+	  struct mazes_cell *southern = cell->neighbors[SOUTH_NEIGHBOR];
+	  struct mazes_cell *eastern = cell->neighbors[EAST_NEIGHBOR];
+	  struct mazes_cell *western = cell->neighbors[WEST_NEIGHBOR];
 
-      cairo_set_source_rgb(cairo, r, g, b);
-      cairo_rectangle(
+	  if (max_color > 0) {
+		double r = start_color.r + increments.r * colors[cell->cell_number];
+		double g = start_color.g + increments.g * colors[cell->cell_number];
+		double b = start_color.b + increments.b * colors[cell->cell_number];
+
+		cairo_set_source_rgb(cairo, r, g, b);
+		cairo_rectangle(
           cairo,
           col * PATH_WIDTH_PIXELS,
           row * PATH_WIDTH_PIXELS,
           PATH_WIDTH_PIXELS,
           PATH_WIDTH_PIXELS
-      );
-      cairo_fill(cairo);
-    }
+		);
+		cairo_fill(cairo);
+	  }
 
-    cairo_set_source_rgb(cairo, 0.0, 0.0, 0.0);
-    if (NULL == northern) {
-      cairo_move_to(cairo, col * PATH_WIDTH_PIXELS, row * PATH_WIDTH_PIXELS);
-      cairo_line_to(cairo, (col + 1) * PATH_WIDTH_PIXELS, row * PATH_WIDTH_PIXELS);
-      cairo_stroke(cairo);
-    }
+	  cairo_set_source_rgb(cairo, 0.0, 0.0, 0.0);
+	  if (NULL == northern) {
+		cairo_move_to(cairo, col * PATH_WIDTH_PIXELS, row * PATH_WIDTH_PIXELS);
+		cairo_line_to(cairo, (col + 1) * PATH_WIDTH_PIXELS, row * PATH_WIDTH_PIXELS);
+		cairo_stroke(cairo);
+	  }
 
-    if (NULL == western) {
-      cairo_move_to(cairo, col * PATH_WIDTH_PIXELS, row * PATH_WIDTH_PIXELS);
-      cairo_line_to(cairo, col * PATH_WIDTH_PIXELS, (row + 1) * PATH_WIDTH_PIXELS);
-      cairo_stroke(cairo);
-    }
+	  if (NULL == western) {
+		cairo_move_to(cairo, col * PATH_WIDTH_PIXELS, row * PATH_WIDTH_PIXELS);
+		cairo_line_to(cairo, col * PATH_WIDTH_PIXELS, (row + 1) * PATH_WIDTH_PIXELS);
+		cairo_stroke(cairo);
+	  }
 
-    if (!mazes_cells_are_linked(cell, eastern)) {
-      cairo_move_to(cairo, (col + 1) * PATH_WIDTH_PIXELS, row * PATH_WIDTH_PIXELS);
-      cairo_line_to(cairo, (col + 1) * PATH_WIDTH_PIXELS, (row + 1) * PATH_WIDTH_PIXELS);
-      cairo_stroke(cairo);
-    }
+	  if (!mazes_cells_are_linked(cell, eastern)) {
+		cairo_move_to(cairo, (col + 1) * PATH_WIDTH_PIXELS, row * PATH_WIDTH_PIXELS);
+		cairo_line_to(cairo, (col + 1) * PATH_WIDTH_PIXELS, (row + 1) * PATH_WIDTH_PIXELS);
+		cairo_stroke(cairo);
+	  }
 
-    if (!mazes_cells_are_linked(cell, southern)) {
-      cairo_move_to(cairo, col * PATH_WIDTH_PIXELS, (row + 1) * PATH_WIDTH_PIXELS);
-      cairo_line_to(cairo, (col + 1) * PATH_WIDTH_PIXELS, (row + 1) * PATH_WIDTH_PIXELS);
-      cairo_stroke(cairo);
-    }
+	  if (!mazes_cells_are_linked(cell, southern)) {
+		cairo_move_to(cairo, col * PATH_WIDTH_PIXELS, (row + 1) * PATH_WIDTH_PIXELS);
+		cairo_line_to(cairo, (col + 1) * PATH_WIDTH_PIXELS, (row + 1) * PATH_WIDTH_PIXELS);
+		cairo_stroke(cairo);
+	  }
+	}
   }
+  free(location);
 
   cairo_surface_write_to_png_stream(surface, write_to_stream, stream);
   cairo_destroy(cairo);

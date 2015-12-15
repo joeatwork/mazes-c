@@ -21,7 +21,7 @@ void no_algorithm(struct mazes_maze *maze) {
 }
 
 void usage(char *command_name) {
-  fprintf(stderr, "usage: %s --width=<value> --height=<value> [--seed=n] [--format=format]\n", command_name);
+  fprintf(stderr, "usage: %s --width=<value> --height=<value> [--depth=<value>] [--seed=n] [--format=format]\n", command_name);
   fprintf(stderr, "          [--format=format] [--algorithm=algorithm] [--coloring=coloring]\n");
   fprintf(stderr, "\n");
   fprintf(stderr, "available formats are:\n");
@@ -47,6 +47,7 @@ int main(int argc, char** argv) {
   struct option options[] = {
     {.name = "width", .has_arg = required_argument, .flag = NULL, .val = 'w'},
     {.name = "height", .has_arg = required_argument, .flag = NULL, .val = 'h'},
+	{.name = "depth", .has_arg = required_argument, .flag = NULL, .val = 'd'},
     {.name = "seed", .has_arg = required_argument, .flag = NULL, .val = 's'},
     {.name = "format", .has_arg = required_argument, .flag = NULL, .val = 'f'},
     {.name = "algorithm", .has_arg = required_argument, .flag = NULL, .val = 'a'},
@@ -56,6 +57,7 @@ int main(int argc, char** argv) {
 
   long propose_width = 0;
   long propose_height = 0;
+  long propose_depth = 0;
   long propose_seed = 42;
   algorithm_type algorithm = mazes_generate_backtracker;
   coloring_type coloring = NULL;
@@ -69,6 +71,9 @@ int main(int argc, char** argv) {
       break;
     case 'h':
       propose_height = strtol(optarg, NULL, 10);
+      break;
+    case 'd':
+      propose_depth = strtol(optarg, NULL, 10);
       break;
     case 's':
       propose_seed = strtol(optarg, NULL, 10);
@@ -141,16 +146,19 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  size_t propose_size[2] = {
+  size_t propose_size[3] = {
 	propose_width,
-	propose_height
+	propose_height,
+	propose_depth
   };
+
+  size_t propose_dimensions = propose_depth ? 3 : 2;
 
   srand(propose_seed);
   mazes_maze_init(
     &maze,
 	propose_size,
-	2
+	propose_dimensions
   );
   mazes_maze_arrange_as_rectangle(&maze);
   algorithm(&maze);
