@@ -1,20 +1,18 @@
-#include <cgraph.h>
-#include <limits.h>
+#include <graphviz/cgraph.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <stdint.h>
 #include <stdlib.h>
 
 #include "layout.h"
 #include "utils.h"
 
-void usage(char *command_name) {
+static void usage(char *command_name) {
   fprintf(stderr, "usage: %s\n", command_name);
   fprintf(stderr, "reads a dot grid on stdin and prints an ascii maze on stdout\n");
   fprintf(stderr, "expects input to have _0, _1, _2 attributes as created by 'grid'\n");
 }
 
-void print_grid(Agraph_t *maze, struct maze_grid grid, FILE *stream) {
+static void print_grid(Agraph_t *maze, struct maze_grid grid, FILE *stream) {
   long floor = 0;
   long row = -1;
 
@@ -123,43 +121,7 @@ int main(int argc, char** argv) {
   }
 
   struct maze_grid grid = maze_read_grid(maze);
-
-  /*  We need to ensure that the following expression doesn't overflow a signed long
-	  max_dimensions.x
-	  + (max_dimensions.y * max_dimensions.x)
-	  + (max_dimensions.z * max_dimensions.x * max_dimensions.y) */
-  long mx = grid.size.x;
-  long my = grid.size.y;
-  long mz = grid.size.z;
-
-  if (0 < mx && 0 < my && 0 < mz) {
-	/* x * y ok? */
-	if (my > LONG_MAX/mx) {
-	  fprintf(stderr, "dimensions too large");
-	  return 1;
-	}
-
-	/* x * y * z ok? */
-	if (mz > LONG_MAX/(mx * my)) {
-	  fprintf(stderr, "dimensions too large");
-	  return 1;
-	}
-
-	/* (x * y) + (x * y * z) ok? */
-	if ((my * mz) > LONG_MAX - (mz * my * mx)) {
-	  fprintf(stderr, "dimensions too large");
-	  return 1;
-	}
-
-	/* and we're all ok! */
-	if (mx > LONG_MAX - ((mz * my * mx) + (my * mx))) {
-	  fprintf(stderr, "dimensions too large");
-	  return 1;
-	}
-  
-	print_grid(maze, grid, stdout);
-  }
-  
+  print_grid(maze, grid, stdout);
   maze_destroy_grid(grid);
   agclose(maze);
 }

@@ -122,9 +122,7 @@ struct maze_grid maze_read_grid(Agraph_t *maze) {
   ret.nodes_count = 0;
   ret.nodes = nodes;
 
-  if (0 == nodes_count) {
-	
-  } else {
+  if (0 < nodes_count) {
 	if (ULONG_MAX == max_dimensions.x ||
 		ULONG_MAX == max_dimensions.y ||
 		ULONG_MAX == max_dimensions.z) {
@@ -134,6 +132,34 @@ struct maze_grid maze_read_grid(Agraph_t *maze) {
 	max_dimensions.x++;
 	max_dimensions.y++;
 	max_dimensions.z++;
+
+	/*  We need to ensure that our sort key doesn't overflow a signed long
+		max_dimensions.x
+		+ (max_dimensions.y * max_dimensions.x)
+		+ (max_dimensions.z * max_dimensions.x * max_dimensions.y) */
+	long mx = max_dimensions.x;
+	long my = max_dimensions.y;
+	long mz = max_dimensions.z;
+
+	/* x * y ok? */
+	if (my > LONG_MAX/mx) {
+	  ERROR_EXIT("dimensions too large");
+	}
+
+	/* x * y * z ok? */
+	if (mz > LONG_MAX/(mx * my)) {
+	  ERROR_EXIT("dimensions too large");
+	}
+
+	/* (x * y) + (x * y * z) ok? */
+	if ((my * mz) > LONG_MAX - (mz * my * mx)) {
+	  ERROR_EXIT("dimensions too large");
+	}
+
+	/* and we're all ok! */
+	if (mx > LONG_MAX - ((mz * my * mx) + (my * mx))) {
+	  ERROR_EXIT("dimensions too large");
+	}
 
 	struct compare_state st;
 	st.p.x = max_dimensions.x;

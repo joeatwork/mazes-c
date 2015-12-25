@@ -1,7 +1,7 @@
 #ifndef __LAYOUT_H__
 #define __LAYOUT_H__
 
-#include <cgraph.h>
+#include <graphviz/cgraph.h>
 
 struct maze_pt3 {
   unsigned long x;
