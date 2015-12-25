@@ -1,14 +1,17 @@
-OBJECTS=algorithms.o layout.o
+OBJECTS=algorithms.o layout.o utils.o
 CFLAGS=-D_GNU_SOURCE -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -g -Wall -Werror -O3 -std=c11
 LDFLAGS= -lm -lglib-2.0 -lcgraph -lcairo
 GITSHA=$(shell git rev-parse HEAD)
 GITDIRTY=$(shell git status --porcelain 2> /dev/null)
 CC=gcc
 
-all: grid maze print png
+all: grid maze print png color
 
 clean:
 	rm *.o
+
+color: main_color.o $(OBJECTS)
+	$(CC) $(CFLAGS) main_color.o $(OBJECTS) -o $@ $(LDFLAGS)
 
 png: main_png.o $(OBJECTS)
 	$(CC) $(CFLAGS) main_png.o $(OBJECTS) -o $@ $(LDFLAGS)

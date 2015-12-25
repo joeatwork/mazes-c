@@ -8,7 +8,7 @@
 
 
 void usage(char *command_name) {
-  fprintf(stderr, "usage: %s --algorithm=<value>\n", command_name);
+  fprintf(stderr, "usage: %s --algorithm=<value> [--seed=number]\n", command_name);
   fprintf(stderr, "reads a dot grid on stdin and turns it into a maze on stdout\n");
   fprintf(stderr, "available algorithms are:\n");
   fprintf(stderr, "    backtracker\n");

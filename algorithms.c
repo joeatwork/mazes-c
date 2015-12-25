@@ -34,10 +34,8 @@ void mazes_generate_backtracker(Agraph_t *maze) {
 	for (Agedge_t *e = agfstedge(maze, top);
 		 NULL != e && neighbors_count < NEIGHBORS_MAX;
 		 e = agnxtedge(maze, e, top)) {
-	  Agnode_t *other;
-	  other = e->node;
-	  
-	  if (NULL == aggetrec(other, "mark", 0) && other != top) {
+	  Agnode_t *other = e->node;
+	  if (NULL == aggetrec(other, "mark", 0)) {
 		neighbors[neighbors_count] = e;
 		neighbors_count++;
 	  }

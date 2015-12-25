@@ -40,8 +40,6 @@ static void png_grid(Agraph_t *maze, struct maze_grid grid, FILE *stream) {
   int width = grid.size.x * PATH_WIDTH_PIXELS;
   int height = grid.size.y * PATH_WIDTH_PIXELS;
 
-  fprintf(stderr, "Width %d Height %d\n", width, height);
-  
   cairo_surface_t *surface = cairo_image_surface_create(
     CAIRO_FORMAT_RGB16_565,
     width + 1,
