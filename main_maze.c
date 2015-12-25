@@ -17,9 +17,11 @@ void usage(char *command_name) {
 int main(int argc, char** argv) {
   char *command_name = argv[0];
   void (*algorithm)(Agraph_t *) = NULL;
+  long seed = 12345;
   
   struct option options[] = {
     {.name = "algorithm", .has_arg = required_argument, .flag = NULL, .val = 'a'},
+	{.name = "seed", .has_arg = required_argument, .flag = NULL, .val = 's'},
     {.name = NULL, .has_arg = 0, .flag = NULL, .val = 0}
   };
 
@@ -35,6 +37,9 @@ int main(int argc, char** argv) {
         return 1;
 	  }
 	  break;
+	case 's':
+      seed = strtol(optarg, NULL, 10);
+      break;
     default:
       fprintf(stderr, "unrecognized option \'%c\'\n", opt);
       usage(command_name);
@@ -48,12 +53,22 @@ int main(int argc, char** argv) {
       return 1;
   }
 
+  if (seed <= 0) {
+	fprintf(stderr, "seed must be a number greater than zero\n");
+	usage(command_name);
+	return 1;
+  }
+
+  srand(seed);
   Agraph_t *maze = agread(stdin, NULL);
   if (NULL == maze) {
 	fprintf(stderr, "could not read maze from stdin\n");
 	usage(command_name);
 	return 1;
   }
+
+  algorithm(maze);
+  
   agwrite(maze, stdout);
   agclose(maze);
 }

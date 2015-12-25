@@ -70,22 +70,7 @@ void print_grid(Agraph_t *maze, struct maze_grid grid, FILE *stream) {
 	for (Agedge_t *e = agfstedge(maze, node); NULL != e; e = agnxtedge(maze, e, node)) {
 	  Agnode_t *other;
 	  struct maze_pt3 other_position;
-	  other= agtail(e);
-	  if (0 == maze_read_location(maze, other, &other_position)) {
-		if (other_position.y > position.y) {
-		  south_paths[i] = true;
-		}		
-		if (other_position.x > position.x) {
-		  east_wall = true;
-		}
-		if (other_position.z > position.z) {
-		  up_wall = true;
-		}
-		if (other_position.z < position.z) {
-		  down_wall = true;
-		}
-	  }
-	  other= aghead(e);
+	  other = e->node;
 	  if (0 == maze_read_location(maze, other, &other_position)) {
 		if (other_position.y > position.y) {
 		  south_paths[position.x] = true;
