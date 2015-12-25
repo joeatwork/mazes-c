@@ -89,18 +89,15 @@ static void png_grid(Agraph_t *maze, struct maze_grid grid, FILE *stream) {
 	  color.b = 1.0;
 	}
 	
-	bool north = false;
-	bool south = false;
-	bool east = false;
-	bool west = false;
-	bool up __attribute__((unused)) = false; 
-	bool down __attribute__((unused)) = false;
-
 	struct maze_pt3 pos;
 	if (0 != maze_read_location(maze, node, &pos)) {
 	  ERROR_EXIT("grid elements must all have locations");
 	}
 
+	if (pos.z > 0) {
+	  break; // TODO for now, only render the bottom floor
+	}
+	
 	cairo_set_source_rgb(cairo, color.r, color.g, color.b);
 	cairo_rectangle(
 	  cairo,
@@ -110,7 +107,14 @@ static void png_grid(Agraph_t *maze, struct maze_grid grid, FILE *stream) {
 	  PATH_WIDTH_PIXELS
 	);
 	cairo_fill(cairo);
-	
+
+	bool north = false;
+	bool south = false;
+	bool east = false;
+	bool west = false;
+	bool up __attribute__((unused)) = false; 
+	bool down __attribute__((unused)) = false;
+
 	cairo_set_source_rgb(cairo, 0.0, 0.0, 0.0);
 	for (Agedge_t *e = agfstedge(maze, node); NULL != e; e = agnxtedge(maze, e, node)) {
 	  Agnode_t *other = e->node;

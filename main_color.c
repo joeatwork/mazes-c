@@ -1,5 +1,6 @@
 #include <graphviz/cgraph.h>
 #include <math.h>
+#include <getopt.h>
 #include <stdbool.h>
 #include "utils.h"
 
@@ -70,6 +71,33 @@ struct distance_rec {
 
 int main(int argc, char** argv) {
   char *command_name = argv[0];
+
+  long seed = 12345;
+  struct option options[] = {
+	{.name = "seed", .has_arg = required_argument, .flag = NULL, .val = 's'},
+    {.name = NULL, .has_arg = 0, .flag = NULL, .val = 0}
+  };
+
+  int opt;
+  while (-1 != (opt = getopt_long(argc, argv, "", options, NULL))) {
+    switch (opt) {
+	case 's':
+      seed = strtol(optarg, NULL, 10);
+      break;
+	default:
+      fprintf(stderr, "unrecognized option \'%c\'\n", opt);
+      usage(command_name);
+      return 1;
+    }
+  }
+
+  if (seed <= 0) {
+	fprintf(stderr, "seed must be a number greater than zero\n");
+	usage(command_name);
+	return 1;
+  }
+
+  srand(seed);
   Agraph_t *maze = agread(stdin, NULL);
   if (NULL == maze) {
 	fprintf(stderr, "could not read maze from stdin\n");
@@ -142,9 +170,9 @@ int main(int argc, char** argv) {
 	  struct distance_rec *dist;
 	  if (NULL != (dist = (struct distance_rec *)aggetrec(n, "distance", 0))) {
 		char attrvalue[256];
-		double r = increment.r * dist->distance;
-		double g = increment.g * dist->distance;
-		double b = increment.b * dist->distance;
+		double r = start_color.r + (increment.r * dist->distance);
+		double g = start_color.g + (increment.g * dist->distance);
+		double b = start_color.b + (increment.b * dist->distance);
 		
 		checked_snprintf(attrvalue, sizeof(attrvalue), "%f,%f,%f", r, g, b);
 		agsafeset(n, "color", attrvalue, "");
