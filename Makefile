@@ -1,4 +1,4 @@
-OBJECTS=algorithms.o layout.o utils.o
+OBJECTS=algorithms.o layout.o utils.o color.o
 CFLAGS=-D_GNU_SOURCE -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -g -Wall -Werror -O3 -std=c11
 LDFLAGS= -lm -lglib-2.0 -lcgraph -lcairo
 GITSHA=$(shell git rev-parse HEAD)

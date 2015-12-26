@@ -1,7 +1,9 @@
 #include <graphviz/cgraph.h>
 #include <math.h>
+#include <stdbool.h>
 #include <stdio.h>
 
+#include "color.h"
 #include "layout.h"
 
 static void usage(char *command_name) {
@@ -27,6 +29,11 @@ static void openscad_grid(Agraph_t *maze, FILE *stream) {
 	  double source_x = scale * nodep.x;
 	  double source_y = scale * nodep.y;
 	  double source_z = scale * nodep.z;
+	  struct maze_rgb color;
+	  bool has_color = (0 == maze_read_rgb(node, &color));
+	  if (has_color) {
+		fprintf(stdout, "color([%f, %f, %f]) ", color.r, color.g, color.b);
+	  }
 	  fprintf(stdout, "translate([%f, %f, %f]) sphere(r=1); // %s\n",
 			  source_x, source_y, source_z, agnameof(node));
 
@@ -40,6 +47,9 @@ static void openscad_grid(Agraph_t *maze, FILE *stream) {
 		  double delta_x = dest_x - source_x;
 		  double delta_y = dest_y - source_y;
 		  double delta_z = dest_z - source_z;
+		  if (has_color) {
+			fprintf(stdout, "color([%f, %f, %f]) ", color.r, color.g, color.b);
+		  }
 		  fprintf(stdout, "translate([%f, %f, %f]) // %s -> %s\n",
 				  source_x, source_y, source_z,
 				  agnameof(node), agnameof(other));

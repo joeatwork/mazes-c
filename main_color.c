@@ -2,17 +2,12 @@
 #include <math.h>
 #include <getopt.h>
 #include <stdbool.h>
+#include "color.h"
 #include "utils.h"
-
-struct rgb {
-  double r;
-  double g;
-  double b;
-};
 
 // Cargo-culted from a stack-overflow answer
 // (in particular, http://stackoverflow.com/questions/3018313/algorithm-to-convert-rgb-to-hsv-and-hsv-to-rgb-in-range-0-255-for-both)
-static struct rgb hue2rgb(double hh) {
+static struct maze_rgb hue2rgb(double hh) {
     if(hh >= 360.0) hh = 0.0;
     hh /= 60.0;
     int i = (long)hh;
@@ -20,7 +15,7 @@ static struct rgb hue2rgb(double hh) {
     double p = 0;
     double q = 1.0 - ff;
 
-    struct rgb out;
+    struct maze_rgb out;
     switch(i) {
     case 0:
         out.r = 1.0;
@@ -159,9 +154,9 @@ int main(int argc, char** argv) {
 
 	double start_hue = 360.0 * ((double) rand()/RAND_MAX);
 	double end_hue = fmod(start_hue + 180.0, 360.0);
-	struct rgb start_color = hue2rgb(start_hue);
-	struct rgb end_color = hue2rgb(end_hue);
-	struct rgb increment;
+	struct maze_rgb start_color = hue2rgb(start_hue);
+	struct maze_rgb end_color = hue2rgb(end_hue);
+	struct maze_rgb increment;
 	increment.r = (end_color.r - start_color.r)/(double)max_distance;
 	increment.g = (end_color.g - start_color.g)/(double)max_distance;
 	increment.b = (end_color.b - start_color.b)/(double)max_distance;

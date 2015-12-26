@@ -4,14 +4,9 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#include "color.h"
 #include "layout.h"
 #include "utils.h"
-
-struct rgb {
-  double r;
-  double g;
-  double b;
-};
 
 static void usage(char *command_name) {
   fprintf(stderr, "usage: %s\n", command_name);
@@ -26,28 +21,6 @@ static cairo_status_t write_to_stream(void *closure, const unsigned char *data, 
     ERROR_EXIT("Error writing to output file");
   }
   return CAIRO_STATUS_SUCCESS;
-}
-
-static int read_rgb(Agnode_t *node, struct rgb *color) {
-  char *val;
-  if (NULL != (val = agget(node, "color"))) {
-	char *end;
-	double red = strtod(val, &end);
-	if (',' != *end) goto fail;
-	double green = strtod(end + 1, &end);
-	if (',' != *end) goto fail;
-	double blue = strtod(end + 1, &end);
-	if ('\0' != *end) goto fail;
-
-	color->r = red;
-	color->g = green;
-	color->b = blue;
-
-	return 0;
-  }
-
- fail:
-  return -1;
 }
 
 #define PATH_WIDTH_PIXELS 10
@@ -82,8 +55,8 @@ static void png_grid(Agraph_t *maze, struct maze_grid grid, FILE *stream) {
 
   for (size_t i = 0; i < grid.nodes_count; i++) {
 	Agnode_t *node = grid.nodes[i];
-	struct rgb color;
-	if (0 != read_rgb(node, &color)) {
+	struct maze_rgb color;
+	if (0 != maze_read_rgb(node, &color)) {
 	  color.r = 1.0;
 	  color.g = 1.0;
 	  color.b = 1.0;
