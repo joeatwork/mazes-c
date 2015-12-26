@@ -11,12 +11,12 @@ void usage(char *command_name) {
   fprintf(stderr, "usage: %s --algorithm=<value> [--seed=number]\n", command_name);
   fprintf(stderr, "reads a dot grid on stdin and turns it into a maze on stdout\n");
   fprintf(stderr, "available algorithms are:\n");
-  fprintf(stderr, "    backtracker\n");
+  fprintf(stderr, "    backtracker (the default)\n");
 }
 
 int main(int argc, char** argv) {
   char *command_name = argv[0];
-  void (*algorithm)(Agraph_t *) = NULL;
+  void (*algorithm)(Agraph_t *) = mazes_generate_backtracker;
   long seed = 12345;
   
   struct option options[] = {
