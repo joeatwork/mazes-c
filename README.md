@@ -4,7 +4,10 @@
 
     ./grid --width=10 --height=10 | ./maze --algorithm=backtracker | ./print
 
-Mazes-c are a collections of tools that you can use 
+Mazes-c are a collections of tools that you can use to make and render
+mazes. They're inspired by Jamis Buck's great book "Mazes for
+Programmers" but is mostly tailored to make cool stuff that I like to
+look at.
 
 ## The tools
 
