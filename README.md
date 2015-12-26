@@ -6,7 +6,7 @@
 
 Mazes-c are a collections of tools that you can use to make and render
 mazes. They're inspired by Jamis Buck's great book "Mazes for
-Programmers" but is mostly tailored to make cool stuff that I like to
+Programmers" but are tailored to making stuff that I like to
 look at.
 
 ## The tools
