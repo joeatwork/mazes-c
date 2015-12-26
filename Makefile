@@ -5,7 +5,7 @@ GITSHA=$(shell git rev-parse HEAD)
 GITDIRTY=$(shell git status --porcelain 2> /dev/null)
 CC=gcc
 
-all: grid maze print png color
+all: grid maze print png color scad
 
 clean:
 	rm *.o
@@ -15,6 +15,9 @@ color: main_color.o $(OBJECTS)
 
 png: main_png.o $(OBJECTS)
 	$(CC) $(CFLAGS) main_png.o $(OBJECTS) -o $@ $(LDFLAGS)
+
+scad: main_scad.o $(OBJECTS)
+	$(CC) $(CFLAGS) main_scad.o $(OBJECTS) -o $@ $(LDFLAGS)
 
 print: main_print.o $(OBJECTS)
 	$(CC) $(CFLAGS) main_print.o $(OBJECTS) -o $@ $(LDFLAGS)
