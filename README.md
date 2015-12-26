@@ -37,7 +37,7 @@ $ ./grid --width=20 --height=5 | ./print
 * `maze` - takes the format produced by grid and produces a maze by
   removing edges. Reads from stdin and writes to stdout.
 
-```
+ ```
 $ ./grid --width=20 --height=5 | ./maze | ./print 
 
 +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
