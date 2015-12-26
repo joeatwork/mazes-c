@@ -1,6 +1,6 @@
 OBJECTS=algorithms.o layout.o utils.o color.o
-CFLAGS=-D_GNU_SOURCE -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -g -Wall -Werror -O3 -std=c11
-LDFLAGS= -lm -lglib-2.0 -lcgraph -lcairo
+CFLAGS=-D_GNU_SOURCE -g -Wall -Werror -O3 -std=c11
+LDFLAGS= -lm -lcgraph -lcairo
 GITSHA=$(shell git rev-parse HEAD)
 GITDIRTY=$(shell git status --porcelain 2> /dev/null)
 CC=gcc
@@ -32,6 +32,9 @@ run-tests: tests
 	./tests
 
 tests: tests.o $(OBJECTS)
-	$(CC) $(CFLAGS) tests.o $(OBJECTS) -o $@ $(LDFLAGS)		
+	$(CC) $(CFLAGS) tests.o $(OBJECTS) -o $@ $(LDFLAGS) -lglib-2.0
+
+tests.o: tests.c
+	$(CC) -c $(CFLAGS) -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include $(CPPFLAGS) -o $@ $<
 
 .PHONY: all clean run-tests
