@@ -8,7 +8,7 @@ CC=gcc
 all: grid maze print png color scad
 
 clean:
-	rm *.o
+	rm tests *.o
 
 color: main_color.o $(OBJECTS)
 	$(CC) $(CFLAGS) main_color.o $(OBJECTS) -o $@ $(LDFLAGS)
@@ -28,7 +28,7 @@ maze: main_maze.o $(OBJECTS)
 grid: main_grid.o $(OBJECTS)
 	$(CC) $(CFLAGS) main_grid.o $(OBJECTS) -o $@ $(LDFLAGS)
 
-run-tests: tests
+run-tests: all tests
 	./tests
 
 tests: tests.o $(OBJECTS)
