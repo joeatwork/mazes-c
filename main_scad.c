@@ -23,6 +23,7 @@ static void openscad_grid(Agraph_t *maze, FILE *stream) {
   fputs("\n", stdout);
   
   double scale = 4.0;
+  fputs("union() {\n", stdout);
   for (Agnode_t *node = agfstnode(maze); NULL != node; node = agnxtnode(maze, node)) {
 	struct maze_pt3 nodep;
 	if (0 == maze_read_location(maze, node, &nodep)) {
@@ -47,7 +48,11 @@ static void openscad_grid(Agraph_t *maze, FILE *stream) {
 		  double delta_x = dest_x - source_x;
 		  double delta_y = dest_y - source_y;
 		  double delta_z = dest_z - source_z;
-		  if (has_color) {
+
+		  char *supported = agget(e, "gravity_support");
+		  if (NULL != supported && (0 == strcmp("true", supported))) {
+			fprintf(stdout, "color([1.0,1.0,1.0]) ");
+		  } else if (has_color) {
 			fprintf(stdout, "color([%f, %f, %f]) ", color.r, color.g, color.b);
 		  }
 		  fprintf(stdout, "translate([%f, %f, %f]) // %s -> %s\n",
@@ -59,6 +64,7 @@ static void openscad_grid(Agraph_t *maze, FILE *stream) {
 	  }
 	}
   }
+  fputs("}\n", stdout);
 }
 
 int main(int argc, char** argv) {

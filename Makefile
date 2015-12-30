@@ -5,13 +5,12 @@ GITSHA=$(shell git rev-parse HEAD)
 GITDIRTY=$(shell git status --porcelain 2> /dev/null)
 CC=gcc
 
-all: grid maze print png color scad
-
+all: grid gravity maze print png color scad
 
 .PHONY: all
 
 clean:
-	rm *.o
+	-rm tests *.o
 
 .PHONY: clean
 
@@ -32,12 +31,15 @@ print: main_print.o $(OBJECTS)
 maze: main_maze.o $(OBJECTS)
 	$(CC) $(CFLAGS) main_maze.o $(OBJECTS) -o $@ $(LDFLAGS)
 
+gravity: main_gravity.o $(OBJECTS)
+	$(CC) $(CFLAGS) main_gravity.o $(OBJECTS) -o $@ $(LDFLAGS)
+
 grid: main_grid.o $(OBJECTS)
 	$(CC) $(CFLAGS) main_grid.o $(OBJECTS) -o $@ $(LDFLAGS)
 
 # Goofball service
 
-container: color grid maze png print scad
+container: all
 	docker build -t mazes-c .
 
 .PHONY: container
@@ -54,7 +56,7 @@ endif
 
 # Tests
 
-run-tests: tests
+run-tests: all tests
 	./tests
 
 .PHONY: run-tests
