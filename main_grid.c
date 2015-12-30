@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
   if (NULL == maze) {
 	ERROR_EXIT("Cannot allocate new maze");
   }
-  
+
   for (long x = 0; x < propose_width; x++) {
 	for (long y = 0; y < propose_height; y++) {
 	  for (long z = 0; z < propose_depth; z++) {
@@ -66,13 +66,13 @@ int main(int argc, char** argv) {
 		if (NULL == node) {
 		  ERROR_EXIT("Can't allocate a graph node");
 		}
-		
+
 		checked_snprintf(attrvalue, sizeof(attrvalue), "%ld", x);
 		agsafeset(node, "_0", attrvalue, "");
-		
+
 		checked_snprintf(attrvalue, sizeof(attrvalue), "%ld", y);
 		agsafeset(node, "_1", attrvalue, "");
-		
+
 		checked_snprintf(attrvalue, sizeof(attrvalue), "%ld", z);
 		agsafeset(node, "_2", attrvalue, "");
 	  }
@@ -94,7 +94,7 @@ int main(int argc, char** argv) {
 		  if (NULL == dest) {
 			ERROR_EXIT("Can't find a graph node");
 		  }
-		  agedge(maze, source, dest, NULL, 1); 
+		  agedge(maze, source, dest, NULL, 1);
 		}
 
 		if (y < propose_height - 1) {
@@ -103,7 +103,7 @@ int main(int argc, char** argv) {
 		  if (NULL == dest) {
 			ERROR_EXIT("Can't find a graph node");
 		  }
-		  agedge(maze, source, dest, NULL, 1); 				  
+		  agedge(maze, source, dest, NULL, 1);
 		}
 
 		if (z < propose_depth - 1) {
@@ -117,7 +117,7 @@ int main(int argc, char** argv) {
 	  }
 	}
   }
-  
+
   agwrite(maze, stdout);
   agclose(maze);
 }
