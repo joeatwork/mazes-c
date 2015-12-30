@@ -5,10 +5,10 @@ GITSHA=$(shell git rev-parse HEAD)
 GITDIRTY=$(shell git status --porcelain 2> /dev/null)
 CC=gcc
 
-all: grid maze print png color scad
+all: grid gravity maze print png color scad
 
 clean:
-	rm tests *.o
+	-rm tests *.o
 
 color: main_color.o $(OBJECTS)
 	$(CC) $(CFLAGS) main_color.o $(OBJECTS) -o $@ $(LDFLAGS)
@@ -24,6 +24,9 @@ print: main_print.o $(OBJECTS)
 
 maze: main_maze.o $(OBJECTS)
 	$(CC) $(CFLAGS) main_maze.o $(OBJECTS) -o $@ $(LDFLAGS)
+
+gravity: main_gravity.o $(OBJECTS)
+	$(CC) $(CFLAGS) main_gravity.o $(OBJECTS) -o $@ $(LDFLAGS)
 
 grid: main_grid.o $(OBJECTS)
 	$(CC) $(CFLAGS) main_grid.o $(OBJECTS) -o $@ $(LDFLAGS)

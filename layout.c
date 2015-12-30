@@ -31,57 +31,40 @@ static int compare_nodes(const void *a, const void *b, void *state_ptr) {
   
   long a_measure = sort_value(st->max, a_pos);
   long b_measure = sort_value(st->max, b_pos);
-  long result = a_measure - b_measure;
-
-  if (result > 0) {
-	return 1;
-  } else if (result < 0) {
-	return -1;
-  }
-
-  return 0;
+  return a_measure - b_measure;
 }
 
+struct search_key {
+  struct maze_pt3 max;
+  long search_value;
+  Agraph_t *maze;
+};
+
+static int compare_for_bsearch(const void *key_ptr, const void *node_ptr_ptr) {
+  struct search_key *key = (struct search_key *)key_ptr;
+  Agnode_t *node = *((Agnode_t **) node_ptr_ptr);
+  struct maze_pt3 node_location;
+  if (0 != maze_read_location(key->maze, node, &node_location)) {
+	ERROR_EXIT("Only nodes with locations can be searched for");
+  }
+  long node_value = sort_value(key->max, node_location);
+  return key->search_value - node_value;
+}
+
+/* TODO - just store grids with holes in them, at least for denser
+   grids. It'll be faster and grids aren't going to be all that sparse
+   all that often. */
 Agnode_t *maze_find_in_grid_at_pt(Agraph_t *maze, struct maze_grid grid, struct maze_pt3 target) {
-  size_t low = 0;
-  size_t high = grid.nodes_count;
-  size_t idx = 0;
-  long target_val = sort_value(grid.size, target);
+  struct search_key key = {
+	.max = grid.size,
+	.search_value = sort_value(grid.size, target),
+	.maze = maze
+  };
 
-  if (low >= high) {
-	return NULL;
-  }
-
-  while (low < high) {
-	idx = (low + high) / 2;
-	Agnode_t *node = grid.nodes[idx];
-	struct maze_pt3 position;
-	if (0 != maze_read_location(maze, node, &position)) {
-	  ERROR_EXIT("Grids must only contain located nodes");
-	}
-	long discovered_val = sort_value(grid.size, position);
-	long comparison = target_val - discovered_val;
-	if (comparison < 0) {
-	  high = idx;
-	} else if (comparison > 0) {
-	  low = idx + 1;
-	} else {
-	  return node;
-	}
-  }
-
-  /* If we don't find an exact match, we look for the
-	 first node larger than our target. */
-  for (; idx < grid.nodes_count; idx++) {
-	Agnode_t *node = grid.nodes[idx];
-	struct maze_pt3 position;
-	if (0 != maze_read_location(maze, node, &position)) {
-	  ERROR_EXIT("Grids must only contain located nodes");
-	}
-	long discovered_val = sort_value(grid.size, position);
-	if (target_val < discovered_val) {
-	  return node;
-	}
+  Agnode_t **found_cell = bsearch(&key, grid.nodes, grid.nodes_count, sizeof(Agnode_t *),
+								  compare_for_bsearch);
+  if (NULL != found_cell) {
+	return *found_cell;
   }
 
   return NULL;
