@@ -5,7 +5,7 @@ GITSHA=$(shell git rev-parse HEAD)
 GITDIRTY=$(shell git status --porcelain 2> /dev/null)
 CC=gcc
 
-all: grid gravity maze print png color scad
+all: assemble grid gravity maze print png color scad
 
 .PHONY: all
 
@@ -15,6 +15,9 @@ clean:
 .PHONY: clean
 
 # Tools
+
+assemble: main_assemble.o $(OBJECTS)
+	$(CC) $(CFLAGS) main_assemble.o $(OBJECTS) -o $@ $(LDFLAGS)
 
 color: main_color.o $(OBJECTS)
 	$(CC) $(CFLAGS) main_color.o $(OBJECTS) -o $@ $(LDFLAGS)

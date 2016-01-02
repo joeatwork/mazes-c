@@ -16,8 +16,6 @@ struct maze_grid {
 };
 
 int maze_read_location(Agraph_t *maze, Agnode_t *node, struct maze_pt3 *position);
-
-// Grid will only contain those nodes with positions such that 
 struct maze_grid maze_read_grid(Agraph_t *maze);
 Agnode_t *maze_find_in_grid_at_pt(Agraph_t *maze, struct maze_grid grid, struct maze_pt3 target);
 void maze_destroy_grid(struct maze_grid grid);

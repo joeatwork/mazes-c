@@ -10,6 +10,8 @@ static void usage(char *command_name) {
   fprintf(stderr, "usage: %s\n", command_name);
   fprintf(stderr, "reads a dot grid on stdin and prints an ascii maze on stdout\n");
   fprintf(stderr, "expects input to have _0, _1, _2 attributes as created by 'grid'\n");
+  fprintf(stderr, "\n");
+  fprintf(stderr, "It doesn't really work for mazes with gaps. Use png or scad for those.\n");
 }
 
 static void print_grid(Agraph_t *maze, struct maze_grid grid, FILE *stream) {
@@ -20,17 +22,17 @@ static void print_grid(Agraph_t *maze, struct maze_grid grid, FILE *stream) {
   for (size_t i = 0; i < grid.size.x; i++) {
 	south_paths[i] = false;
   }
-  
+
   for (size_t i = 0; i < grid.nodes_count; i++) {
 	Agnode_t *node = grid.nodes[i];
 	struct maze_pt3 position;
 	if (0 != maze_read_location(maze, node, &position)) {
 	  ERROR_EXIT("grid must only contain locations");
 	}
-	
+
 	if (position.z != floor) {
 	  fputc('\n', stream);
-	  fputc('+', stream); // Bottom of the last row?? TODO
+	  fputc('+', stream);
 	  for (size_t i = 0; i < grid.size.x; i++) {
 		fputs("--+", stream);
 	  }
@@ -52,7 +54,7 @@ static void print_grid(Agraph_t *maze, struct maze_grid grid, FILE *stream) {
 		} else {
 		  fputs("--", stream);
 		}
-		
+
 		fputs("+", stream);
 	  }
 	  fputc('\n', stream);
@@ -72,7 +74,7 @@ static void print_grid(Agraph_t *maze, struct maze_grid grid, FILE *stream) {
 	  if (0 == maze_read_location(maze, other, &other_position)) {
 		if (other_position.y > position.y) {
 		  south_paths[position.x] = true;
-		}		
+		}
 		if (other_position.x > position.x) {
 		  east_wall = true;
 		}
@@ -103,7 +105,7 @@ static void print_grid(Agraph_t *maze, struct maze_grid grid, FILE *stream) {
   }
 
   fputc('\n', stream);
-  fputc('+', stream); // Bottom of the last row?? TODO
+  fputc('+', stream);
   for (size_t i = 0; i < grid.size.x; i++) {
 	fputs("--+", stream);
   }
