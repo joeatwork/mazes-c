@@ -9,8 +9,8 @@
 
 void usage(char *command_name) {
   fprintf(stderr, "usage: %s\n", command_name);
-  fprintf(stderr, "Reads coordinates from stdin and glues them together\n");
-  fprintf(stderr, "with adjacent coordinates into a shaped grid, and writes\n");
+  fprintf(stderr, "Reads coordinates from stdin and adds edges between adjacent\n");
+  fprintf(stderr, "rectangular coordinates into a shaped grid, and writes\n");
   fprintf(stderr, "a dot graph to stdout.\n");
   fprintf(stderr, "\n");
   fprintf(stderr, "Input should be lines of three numbers, separated by commas, like:\n");
