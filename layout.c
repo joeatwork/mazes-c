@@ -28,7 +28,7 @@ static int compare_nodes(const void *a, const void *b, void *state_ptr) {
   if (0 != maze_read_location(st->maze, b_node, &b_pos)) {
 	ERROR_EXIT("only nodes with locations can be compared");
   }
-  
+
   long a_measure = sort_value(st->max, a_pos);
   long b_measure = sort_value(st->max, b_pos);
   return a_measure - b_measure;
@@ -92,7 +92,7 @@ int maze_read_location(Agraph_t *maze, Agnode_t *n, struct maze_pt3 *position) {
   bool x_valid = false;
   bool y_valid = false;
   bool z_valid = false;
-  
+
   {
 	char *xstr = agget(n, "_0");
 	if (NULL != xstr) {
@@ -127,7 +127,7 @@ int maze_read_location(Agraph_t *maze, Agnode_t *n, struct maze_pt3 *position) {
 		z_valid = true;
 	  }
 	}
-  }	
+  }
 
   if (x_valid && y_valid && z_valid) {
 	position->x = x;
@@ -150,13 +150,13 @@ struct maze_grid maze_read_grid(Agraph_t *maze) {
 	if (0 == maze_read_location(maze, n, &position)) {
 	  if (max_dimensions.x < position.x)
 		max_dimensions.x = position.x;
-	  
+
 	  if (max_dimensions.y < position.y)
 		max_dimensions.y = position.y;
 
 	  if (max_dimensions.z < position.z)
 		max_dimensions.z = position.z;
-	  
+
 	  nodes[nodes_count] = n;
 	  nodes_count++;
 	}
@@ -175,7 +175,7 @@ struct maze_grid maze_read_grid(Agraph_t *maze) {
 		ULONG_MAX == max_dimensions.z) {
 	  ERROR_EXIT("dimensions too large");
 	}
-	
+
 	max_dimensions.x++;
 	max_dimensions.y++;
 	max_dimensions.z++;
