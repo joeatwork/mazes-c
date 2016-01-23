@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
       propose_depth = strtol(optarg, NULL, 10);
       break;
     default:
-      fprintf(stderr, "unrecognized option \'%c\'\n", opt);
+      fprintf(stderr, "unrecognized option '%c'\n", opt);
       usage(command_name);
       return 1;
     }
