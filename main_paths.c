@@ -16,7 +16,7 @@ static void usage(char *command_name) {
 
 static void dumpNode(Agraph_t *maze, Agnode_t *node) {
   Agsym_t *sym = NULL;
-  bool printed = true;
+  bool printed = false;
 
   fprintf(stdout, "{\"name\":\"%s\",", agnameof(node));
   fprintf(stdout, "\"attributes\":{");
@@ -26,7 +26,7 @@ static void dumpNode(Agraph_t *maze, Agnode_t *node) {
 	  if (printed) {
 		fputc(',', stdout);
 	  } else {
-		printed = false;
+		printed = true;
 	  }
 	  fprintf(stdout, "\"%s\":\"%s\"", sym->name, val);
 	}
