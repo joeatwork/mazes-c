@@ -9,6 +9,8 @@
 #include "layout.h"
 #include "utils.h"
 
+#define MAX_PATH_WIDTH 100
+
 static void usage(char *command_name) {
   fprintf(stderr, "usage: %s [--paths=<bool> --walls=<bool>]\n", command_name);
   fprintf(stderr, "reads a dot grid on stdin and prints an ascii maze on stdout\n");
@@ -28,78 +30,76 @@ static cairo_status_t write_to_stream(void *closure, const unsigned char *data, 
   return CAIRO_STATUS_SUCCESS;
 }
 
-#define PATH_WIDTH_PIXELS 10
-
-static void draw_paths(cairo_t *cairo, struct maze_pt3 pos, bool north, bool south, bool east, bool west) {
-  double half = PATH_WIDTH_PIXELS/2.0;
-  double center_x = (pos.x * PATH_WIDTH_PIXELS) + half;
-  double center_y = (pos.y * PATH_WIDTH_PIXELS) + half;
+static void draw_paths(cairo_t *cairo, struct maze_pt3 pos, uint path_width, bool north, bool south, bool east, bool west) {
+  double half = path_width/2.0;
+  double center_x = (pos.x * path_width) + half;
+  double center_y = (pos.y * path_width) + half;
   if (north) {
-	cairo_move_to(cairo, center_x, pos.y * PATH_WIDTH_PIXELS);
+	cairo_move_to(cairo, center_x, pos.y * path_width);
 	cairo_line_to(cairo, center_x, center_y);
 	cairo_stroke(cairo);
   }
 
   if (south) {
-	cairo_move_to(cairo, center_x, (pos.y + 1) * PATH_WIDTH_PIXELS);
+	cairo_move_to(cairo, center_x, (pos.y + 1) * path_width);
 	cairo_line_to(cairo, center_x, center_y);
 	cairo_stroke(cairo);
   }
 
   if (west) {
-	cairo_move_to(cairo, (pos.x + 1) * PATH_WIDTH_PIXELS, center_y);
+	cairo_move_to(cairo, (pos.x + 1) * path_width, center_y);
 	cairo_line_to(cairo, center_x, center_y);
 	cairo_stroke(cairo);
   }
 
   if (east) {
-	cairo_move_to(cairo, pos.x * PATH_WIDTH_PIXELS, center_y);
+	cairo_move_to(cairo, pos.x * path_width, center_y);
 	cairo_line_to(cairo, center_x, center_y);
 	cairo_stroke(cairo);
   }
 }
 
-static void draw_walls(cairo_t *cairo, struct maze_pt3 pos, bool north, bool south, bool east, bool west) {
+static void draw_walls(cairo_t *cairo, struct maze_pt3 pos, uint path_width, bool north, bool south, bool east, bool west) {
   if (!north) {
-	cairo_move_to(cairo, pos.x * PATH_WIDTH_PIXELS, pos.y * PATH_WIDTH_PIXELS);
-	cairo_line_to(cairo, (pos.x + 1) * PATH_WIDTH_PIXELS, pos.y * PATH_WIDTH_PIXELS);
+	cairo_move_to(cairo, pos.x * path_width, pos.y * path_width);
+	cairo_line_to(cairo, (pos.x + 1) * path_width, pos.y * path_width);
 	cairo_stroke(cairo);
   }
 
   if (!south) {
-	cairo_move_to(cairo, pos.x * PATH_WIDTH_PIXELS, (pos.y + 1) * PATH_WIDTH_PIXELS);
-	cairo_line_to(cairo, (pos.x + 1) * PATH_WIDTH_PIXELS, (pos.y + 1) * PATH_WIDTH_PIXELS);
+	cairo_move_to(cairo, pos.x * path_width, (pos.y + 1) * path_width);
+	cairo_line_to(cairo, (pos.x + 1) * path_width, (pos.y + 1) * path_width);
 	cairo_stroke(cairo);
   }
 
   if (!east) {
-	cairo_move_to(cairo, pos.x * PATH_WIDTH_PIXELS, pos.y * PATH_WIDTH_PIXELS);
-	cairo_line_to(cairo, pos.x * PATH_WIDTH_PIXELS, (pos.y + 1) * PATH_WIDTH_PIXELS);
+	cairo_move_to(cairo, pos.x * path_width, pos.y * path_width);
+	cairo_line_to(cairo, pos.x * path_width, (pos.y + 1) * path_width);
 	cairo_stroke(cairo);
   }
 
   if (!west) {
-	cairo_move_to(cairo, (pos.x + 1) * PATH_WIDTH_PIXELS, pos.y * PATH_WIDTH_PIXELS);
-	cairo_line_to(cairo, (pos.x + 1) * PATH_WIDTH_PIXELS, (pos.y + 1) * PATH_WIDTH_PIXELS);
+	cairo_move_to(cairo, (pos.x + 1) * path_width, pos.y * path_width);
+	cairo_line_to(cairo, (pos.x + 1) * path_width, (pos.y + 1) * path_width);
 	cairo_stroke(cairo);
   }
 }
 
-static void png_grid(Agraph_t *maze, struct maze_grid grid, FILE *stream, bool do_walls, bool do_paths) {
-  if (grid.size.x > (INT_MAX / (PATH_WIDTH_PIXELS + 1)) - 1) {
+static void png_grid(Agraph_t *maze, struct maze_grid grid, FILE *stream, uint path_width, bool do_walls, bool do_paths) {
+  if (grid.size.x > (INT_MAX / (path_width + 1)) - 1) {
 	ERROR_EXIT("maze is too large to render into a png");
   }
 
-  if (grid.size.y > (INT_MAX / (PATH_WIDTH_PIXELS + 1)) - 1) {
+  if (grid.size.y > (INT_MAX / (path_width + 1)) - 1) {
 	ERROR_EXIT("maze is too large to render into a png");
   }
 
-  if (grid.size.z > (INT_MAX / (PATH_WIDTH_PIXELS + 1)) - 1) {
+  if (grid.size.z > (INT_MAX / (path_width + 1)) - 1) {
 	ERROR_EXIT("maze is too large to render into a png");
   }
 
-  int width = grid.size.x * PATH_WIDTH_PIXELS;
-  int height = grid.size.y * PATH_WIDTH_PIXELS;
+  int width = grid.size.x * path_width;
+  int height = grid.size.y * path_width;
 
   cairo_surface_t *surface = cairo_image_surface_create(
     CAIRO_FORMAT_RGB16_565,
@@ -134,10 +134,10 @@ static void png_grid(Agraph_t *maze, struct maze_grid grid, FILE *stream, bool d
 	cairo_set_source_rgb(cairo, color.r, color.g, color.b);
 	cairo_rectangle(
 	  cairo,
-	  pos.x * PATH_WIDTH_PIXELS,
-	  pos.y * PATH_WIDTH_PIXELS,
-	  PATH_WIDTH_PIXELS,
-	  PATH_WIDTH_PIXELS
+	  pos.x * path_width,
+	  pos.y * path_width,
+	  path_width,
+	  path_width
 	);
 	cairo_fill(cairo);
 
@@ -176,11 +176,11 @@ static void png_grid(Agraph_t *maze, struct maze_grid grid, FILE *stream, bool d
 	}
 
 	if (do_walls) {
-	  draw_walls(cairo, pos, north, south, east, west);
+	  draw_walls(cairo, pos, path_width, north, south, east, west);
 	}
 
 	if (do_paths) {
-	  draw_paths(cairo, pos, north, south, east, west);
+	  draw_paths(cairo, pos, path_width, north, south, east, west);
 	}
   }
 
@@ -195,11 +195,13 @@ int main(int argc, char** argv) {
   struct option options[] = {
 	{.name = "paths", .has_arg = optional_argument, .flag = NULL, .val = 'p'},
     {.name = "walls", .has_arg = optional_argument, .flag = NULL, .val = 'w'},
+    {.name = "path-width", .has_arg = required_argument, .flag = NULL, .val = 'A' },
     {.name = NULL, .has_arg = 0, .flag = NULL, .val = 0}
   };
 
   bool do_paths = false;
   bool do_walls = true;
+  uint path_width = 10;
 
   int opt;
   while (-1 != (opt = getopt_long(argc, argv, "", options, NULL))) {
@@ -230,11 +232,26 @@ int main(int argc, char** argv) {
 		return 1;
 	  }
 	  break;
+    case 'A':
+      path_width = strtol(optarg, NULL, 10);
+      break;
 	default:
 	  fprintf(stderr, "unrecognized option '%c'\n", opt);
 	  usage(command_name);
 	  return 1;
 	}
+  }
+
+  if (0 == path_width) {
+    fprintf(stderr, "path_width must be greater than zero\n");
+    usage(command_name);
+    return 1;
+  }
+
+  if (MAX_PATH_WIDTH < path_width) {
+    fprintf(stderr, "path_width must be less that %d\n", MAX_PATH_WIDTH);
+    usage(command_name);
+    return 1;
   }
 
   Agraph_t *maze = agread(stdin, NULL);
@@ -245,7 +262,7 @@ int main(int argc, char** argv) {
   }
 
   struct maze_grid grid = maze_read_grid(maze);
-  png_grid(maze, grid, stdout, do_walls, do_paths);
+  png_grid(maze, grid, stdout, path_width, do_walls, do_paths);
   maze_destroy_grid(grid);
   agclose(maze);
 }
