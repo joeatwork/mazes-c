@@ -10,15 +10,16 @@
 #include "utils.h"
 
 #define MAX_PATH_WIDTH 100
+#define DEFAULT_PATH_WIDTH 10
 
 static void usage(char *command_name) {
-  fprintf(stderr, "usage: %s [--paths=<bool> --walls=<bool>]\n", command_name);
+  fprintf(stderr, "usage: %s [--paths=<bool> --walls=<bool> --path-width=<number>]\n", command_name);
   fprintf(stderr, "reads a dot grid on stdin and prints an ascii maze on stdout\n");
   fprintf(stderr, "expects input to have _0, _1, _2 attributes as created by 'grid'\n");
   fprintf(stderr, "\n");
-  fprintf(stderr, "By default, will print the walls of the paze, but if --paths is\n");
-  fprintf(stderr, "present and true will print the paths as well. To print only the\n");
-  fprintf(stderr, "path without walls, use --walls=false --paths=true\n");
+  fprintf(stderr, "By default, will print the walls of the maze, %d pixels apart.\n", DEFAULT_PATH_WIDTH);
+  fprintf(stderr, "if --paths present and true will print a 1 pixel line along paths as well.\n");
+  fprintf(stderr, "To render without walls, use --walls=false\n");
 }
 
 static cairo_status_t write_to_stream(void *closure, const unsigned char *data, unsigned int length) {
@@ -201,7 +202,7 @@ int main(int argc, char** argv) {
 
   bool do_paths = false;
   bool do_walls = true;
-  uint path_width = 10;
+  uint path_width = DEFAULT_PATH_WIDTH;
 
   int opt;
   while (-1 != (opt = getopt_long(argc, argv, "", options, NULL))) {
