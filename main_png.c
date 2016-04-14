@@ -9,7 +9,7 @@
 #include "layout.h"
 #include "utils.h"
 
-#define MAX_PATH_WIDTH 256
+#define MAX_PATH_WIDTH 1024
 #define DEFAULT_PATH_WIDTH 10
 
 static void usage(char *command_name) {
