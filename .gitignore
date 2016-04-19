@@ -2,6 +2,7 @@ assemble
 color
 grid
 maze
+paths
 png
 print
 scad
