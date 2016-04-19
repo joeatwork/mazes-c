@@ -52,8 +52,8 @@ container: all
 
 push-container: container
 ifeq ($(strip $(GITDIRTY)),)
-	docker tag mazes-c quay.io/joeatwork/mazes-c:$(GITSHA)
-	docker push quay.io/joeatwork/mazes-c:$(GITSHA)
+	docker tag mazes-c staging.quay.io/joeatwork/mazes-c:$(GITSHA)
+	docker push staging.quay.io/joeatwork/mazes-c:$(GITSHA)
 else
 	@echo "I won't push the container from a dirty repo"
 endif
