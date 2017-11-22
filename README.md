@@ -68,7 +68,7 @@ $ ./grid --width=20 --height=5 | ./maze | ./print
 # Building the tools
 
 Building mazes-c requires graphviz's cgraph headers and library, and
-cairo. The tests require glib-2.0. I build on Ubuntu wily, with
+cairo. The tests require glib-2.0. I build on Ubuntu, with
 libcairo2-dev and libgraphviz-dev, using gcc.
 
 To build, I just run
@@ -78,3 +78,6 @@ To build, I just run
 To run the (not really actual) tests, run
 
     make run-tests
+
+A more detailed description of the requirements to build the system
+can be inferred from the Dockerfile included with this project.
