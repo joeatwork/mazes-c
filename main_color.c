@@ -121,6 +121,7 @@ int main(int argc, char** argv) {
 	  ERROR_EXIT("failed to pick a starting node");
 	}
 
+    // TODO: it'd be nice to support unconnected mazes.
 	Agnode_t **stack = checked_calloc(nodecount, sizeof(Agnode_t *));
 	stack[0] = found;
 	size_t stack_size = 1;
@@ -157,9 +158,17 @@ int main(int argc, char** argv) {
 	struct maze_rgb start_color = hue2rgb(start_hue);
 	struct maze_rgb end_color = hue2rgb(end_hue);
 	struct maze_rgb increment;
-	increment.r = (end_color.r - start_color.r)/(double)max_distance;
-	increment.g = (end_color.g - start_color.g)/(double)max_distance;
-	increment.b = (end_color.b - start_color.b)/(double)max_distance;
+
+    // singleton mazes.
+    if (max_distance == 0) {
+        increment.r = 0;
+        increment.g = 0;
+        increment.b = 0;
+    } else {
+	    increment.r = (end_color.r - start_color.r)/(double)max_distance;
+	    increment.g = (end_color.g - start_color.g)/(double)max_distance;
+	    increment.b = (end_color.b - start_color.b)/(double)max_distance;
+    }
 
 	for (Agnode_t *n = agfstnode(maze); NULL != n; n = agnxtnode(maze, n)) {
 	  struct distance_rec *dist;
