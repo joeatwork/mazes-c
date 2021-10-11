@@ -78,6 +78,9 @@ Refer to the usage messages of the programs for more detailed help.
 - `paths` reads a maze in the common, dot-ish format, and produces
   JSON that can be used to reconstruct the maze.
 
+You can also run a (toy, insecure) server using `server.sh`, and run
+that server in a Docker image using the included `Dockerfile`.
+
 # Building the tools
 
 Building mazes-c requires graphviz's cgraph headers and library, and
@@ -93,4 +96,8 @@ To run the (not really actual) tests, run
     make run-tests
 
 A more detailed description of the requirements to build the system
-can be inferred from the Dockerfile included with this project.
+can be inferred from the Dockerfile included with this project. You
+can build the dockerfile (which includes the very silly, certainly
+insecure maze service) you can run.
+
+    make container
