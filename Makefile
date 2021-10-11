@@ -50,16 +50,6 @@ container: all
 
 .PHONY: container
 
-push-container: container
-ifeq ($(strip $(GITDIRTY)),)
-	docker tag mazes-c quay.io/joeatwork/mazes-c:$(GITSHA)
-	docker push quay.io/joeatwork/mazes-c:$(GITSHA)
-else
-	@echo "I won't push the container from a dirty repo"
-endif
-
-.PHONY: push-container
-
 # Tests
 
 run-tests: all tests
